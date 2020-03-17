@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>CleanCode.Tool</RootNamespace>
+        <AssemblyName>clean-code</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Company>Mopozko</Company>
+        <Version>0.0.1-beta</Version>
+        <AssemblyTitle>clean-code</AssemblyTitle>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
+      <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="TransformSettingsReSharperCLT.zip">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
