@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using CleanCode.Results;
 
@@ -5,7 +6,7 @@ namespace CleanCode.Helpers
 {
     public static class Cmd
     {
-        public static Result<None> RunProcess(string command, string args)
+        public static Result<None> RunProcess(string command, string args, Action<string> callBack = null)
         {
             var startInfo = new ProcessStartInfo(command, args)
             {
@@ -21,6 +22,15 @@ namespace CleanCode.Helpers
 
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
+            
+            process.OutputDataReceived +=
+                (sender, args) =>
+            {
+                var line = args.Data;
+                if (line != null)
+                    callBack(line);
+            };
+
 
             process.WaitForExit();
 

@@ -13,18 +13,13 @@ namespace CleanCode.Cli.Commands
         public static void StartCommand(IEnumerable<string> args)
         {
             Parser.Default
-                .ParseArguments<CleanupCommandOptions, CodeInspectionsCommandOptions, UpdateToolCommandOptions>(args)
-                .WithParsed<CleanupCommandOptions>(ExecuteCommand)
-                .WithParsed<CodeInspectionsCommandOptions>(ExecuteCommand)
-                .WithParsed<UpdateToolCommandOptions>(ExecuteCommand);
+                .ParseArguments<CleanupCommand, CodeInspectionsCommand, UpdateToolCommand>(args)
+                .WithParsed<ICommand>(ExecuteCommand);
         }
 
-        private static void ExecuteCommand<TOpt>(ICommandOptions<TOpt> commandOptions)
-            where TOpt : ICommandOptions<TOpt>
+        private static void ExecuteCommand(ICommand command)
         {
-            commandOptions
-                .GenerateCommand()
-                .Then(command => command.Run())
+            command.Run()
                 .OnFail(ConsoleHelper.LogError);
         }
     }

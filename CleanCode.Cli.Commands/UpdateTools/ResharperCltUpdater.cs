@@ -5,11 +5,13 @@ using System.Net;
 using System.Text;
 using CleanCode.Helpers;
 using CleanCode.Results;
+using CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CleanCode.Cli.Commands.UpdateTools
 {
+    [Verb("update", HelpText = "Check new resharper-clt version and install if need")]
     public static class ResharperCltUpdater
     {
         private const string MetaUrl =
@@ -43,7 +45,6 @@ namespace CleanCode.Cli.Commands.UpdateTools
 
             return state.Version != currentVersion;
         }
-
 
         private static void UpdateState(string newVersion)
         {

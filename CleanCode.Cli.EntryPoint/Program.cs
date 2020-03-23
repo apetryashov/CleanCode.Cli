@@ -4,6 +4,9 @@ namespace CleanCode.Tool
 {
     internal static class Program
     {
-        private static void Main(string[] args) => CommandProvider.StartCommand(args);
-    }
+        private static void Main(string[] args)
+        {
+            CommandProvider.StartCommand(args);
+        }
+    }    
 }

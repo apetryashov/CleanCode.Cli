@@ -1,13 +1,23 @@
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Helpers;
 using CleanCode.Results;
+using CommandLine;
 
 namespace CleanCode.Cli.Commands.CodeInspections
 {
+    [Verb("code-inspections", HelpText = "Start ReSharper code-inspection tool for given directory")]
     public class CodeInspectionsCommand : ICommand
     {
+        [Option('s', "solution",
+            Required = false,
+            Default = ".",
+            HelpText = "Custom path to .sln file. Current directory by default ")]
+        public string PathToSlnFolder { get; set; } = ".";
+        
         private static string ReSharperCleanupCodeCli
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\inspectcode.exe");
 
@@ -16,25 +26,30 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
         private static string PathToXsltFile
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt");
+        
+        private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
+        
 
-        private readonly string pathToSlnFolder;
-
-        public CodeInspectionsCommand(CodeInspectionsCommandOptions options)
+        public Result<None> Run()
         {
-            pathToSlnFolder = options.PathToSlnFolder!;
+            var files = FileUtils.GetAllValuableCsFiles(new DirectoryInfo(PathToSlnFolder)).ToList();
+            var progressBar = new FilesCheckingProgressBar(files);
+
+            return ResharperCltUpdater.UpdateIfNeed()
+                .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
+                .Then(sln =>
+                {
+                    using var tempDir = new TempDirectory();
+                    var tempFile = $"{tempDir.PathToTempDirectory}/temp";
+
+                    ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
+                    var args = ArgsForCodeInspections(tempFile, sln.FullName);
+                    return Cmd.RunProcess(ReSharperCleanupCodeCli, args, progressBar.RegisterFile)
+                        .Then(_ => ConsoleHelper.ClearCurrentConsoleLine())
+                        .Then(_ => CheckXmlReport(tempFile))
+                        .Then(_ => ConsoleHelper.LogInfo("All files are clean"));
+                });
         }
-
-        public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed()
-            .Then(_ => FileUtils.GetPathToSlnFile(pathToSlnFolder))
-            .Then(sln =>
-            {
-                using var tempDir = new TempDirectory();
-                var tempFile = $"{tempDir.PathToTempDirectory}/temp";
-
-                ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
-                return Cmd.RunProcess(ReSharperCleanupCodeCli, ArgsForCodeInspections(tempFile, sln.FullName))
-                    .Then(__ => CheckXmlReport(tempFile));
-            });
 
         private static string ArgsForCodeInspections(string outFile, string slnFile) => $"--o={outFile} {slnFile}";
 
@@ -49,10 +64,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
                 .ToList();
 
             if (!failFiles.Any())
-            {
-                ConsoleHelper.LogInfo("All files are clean");
                 return Result.Ok();
-            }
 
             return Cmd.RunProcess("powershell", ArgsForHtmlConverter(pathToXmlReport))
                 .Then(_ =>
@@ -69,6 +81,5 @@ You can find the full code inspection report here: code-inspections.html"
 
         private static string ArgsForHtmlConverter(string xmpReportPath)
             => $"{PathToTransformSettings} {xmpReportPath} {PathToXsltFile} code-inspections.html";
-        
     }
 }
