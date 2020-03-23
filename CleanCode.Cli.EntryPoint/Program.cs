@@ -2,6 +2,7 @@
 
 namespace CleanCode.Tool
 {
+    //TODO: Затащить это все в chocolatey
     internal static class Program
     {
         private static void Main(string[] args)

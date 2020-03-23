@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,13 +7,13 @@ using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
+using JetBrains.Annotations;
 
 namespace CleanCode.Cli.Commands.CodeInspections
 {
+    //TODO: кажется, что это можно декомпозировать
+    [PublicAPI]
     [Verb("code-inspections", HelpText = "Start ReSharper code-inspection tool for given directory")]
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class CodeInspectionsCommand : ICommand
     {
         [Option('s', "solution",
@@ -40,7 +39,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
                     ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
 
-                    return ReSharperCltHelper.RunCleanupCodeTool(tempFile, sln.FullName, progressBar.RegisterFile)
+                    return ReSharperClt.RunCleanupCodeTool(tempFile, sln.FullName, progressBar.RegisterFile)
                         .Then(_ => ConsoleHelper.ClearCurrentConsoleLine())
                         .Then(_ => CheckXmlReport(tempFile))
                         .Then(_ => ConsoleHelper.LogInfo("All files are clean"));
@@ -54,7 +53,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
             if (!failFiles.Any())
                 return Result.Ok();
 
-            return ReSharperCltHelper.ConvertXmlReportToHtml(pathToXmlReport)
+            return ReSharperClt.ConvertXmlReportToHtml(pathToXmlReport)
                 .Then(_ => GetErrorFilesAsFailResult());
 
             Result<None> GetErrorFilesAsFailResult()

@@ -1,18 +1,19 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace CleanCode.Helpers
 {
-    public class FilesCheckingProgressBar
+    public class FilesCheckingProgressBar //TODO: это все же нужно переделать
     {
         private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
         private readonly HashSet<string> uncheckedFiles;
         private readonly int totalFiles;
 
-        public FilesCheckingProgressBar(IEnumerable<string> validatedFiles)
+        public FilesCheckingProgressBar(IEnumerable<FileInfo> validatedFiles)
         {
-            uncheckedFiles = validatedFiles.Select(x => ExtractCsFile.Match(x).Value).ToHashSet();
+            uncheckedFiles = validatedFiles.Select(info => info.Name).ToHashSet();
             totalFiles = uncheckedFiles.Count;
         }
 

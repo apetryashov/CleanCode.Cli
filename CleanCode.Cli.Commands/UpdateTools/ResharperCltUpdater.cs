@@ -6,11 +6,15 @@ using System.Text;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CleanCode.Cli.Commands.UpdateTools
 {
+    //TODO: тут тоже нужно рефакторить
+    //TODO: очищать кэш при установке новой версии
+    [PublicAPI]
     [Verb("update", HelpText = "Check new resharper-clt version and install if need")]
     public static class ResharperCltUpdater
     {

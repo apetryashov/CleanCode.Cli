@@ -1,27 +1,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
 using CleanCode.Helpers;
 using Newtonsoft.Json;
 
 namespace CleanCode.Cli.Commands
 {
-    public static class FilesHashCacheStorage
+    public static class FilesHashCacheStorage //TODO: переделать на работу с какой-нибудь базой или еще что
     {
         private static readonly IDictionary<string, string> FilesHashCache = ReadHashes();
 
-        public static IReadOnlyCollection<string> GetChangedFiles(DirectoryInfo directory)
+        public static IReadOnlyCollection<FileInfo> GetChangedFiles(DirectoryInfo directory)
         {
             return FileUtils.GetAllValuableCsFiles(directory)
-                .Select(fileName => (fileName, hash: FileUtils.CalculateFileHash(fileName)))
-                .Where(x => IsChangedFile(x.fileName, x.hash))
-                .Select(x => x.fileName)
+                .Select(fileInfo => (fileInfo, hash: FileUtils.CalculateFileHash(fileInfo)))
+                .Where(x => IsChangedFile(x.fileInfo, x.hash))
+                .Select(x => x.fileInfo)
                 .ToList();
 
-            static bool IsChangedFile(string fullFileName, string fileHash)
+            static bool IsChangedFile(FileSystemInfo fileInfo, string fileHash)
             {
-                if (!FilesHashCache.TryGetValue(fullFileName, out var currentHash))
+                if (!FilesHashCache.TryGetValue(fileInfo.FullName, out var currentHash))
                     return true;
 
                 return currentHash != fileHash;
@@ -34,20 +33,18 @@ namespace CleanCode.Cli.Commands
                 return new Dictionary<string, string>();
 
             var changedFile = File.ReadAllText("filesHash");
-            var abc = JsonConvert.DeserializeObject<Dictionary<string, string>>(changedFile);
-
-            return abc;
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(changedFile);
         }
 
-        public static IEnumerable<string> UpdateFilesHash(IEnumerable<string> files)
+        public static IEnumerable<FileInfo> UpdateFilesHash(IEnumerable<FileInfo> files)
         {
             foreach (var file in files)
             {
                 var currentHash = FileUtils.CalculateFileHash(file);
-                if (FilesHashCache.TryGetValue(file, out var hash) && hash != currentHash)
+                if (FilesHashCache.TryGetValue(file.FullName, out var hash) && hash != currentHash)
                     yield return file;
 
-                FilesHashCache[file] = FileUtils.CalculateFileHash(file);
+                FilesHashCache[file.FullName] = FileUtils.CalculateFileHash(file);
             }
 
             var serializeObject = JsonConvert.SerializeObject(FilesHashCache);

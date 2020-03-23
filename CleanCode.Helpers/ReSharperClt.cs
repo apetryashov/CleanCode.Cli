@@ -1,10 +1,10 @@
 using System;
-using CleanCode.Helpers;
+using CleanCode.Cli;
 using CleanCode.Results;
 
-namespace CleanCode.Cli.Commands
+namespace CleanCode.Helpers
 {
-    public static class ReSharperCltHelper
+    public static class ReSharperClt
     {
         private static string ReSharperCleanupCodeCli
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\inspectcode.exe");

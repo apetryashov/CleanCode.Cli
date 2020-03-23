@@ -27,7 +27,7 @@ namespace CleanCode.Helpers
             return slnFiles.First();
         }
 
-        public static IEnumerable<string> GetAllValuableCsFiles(DirectoryInfo directoryInfo)
+        public static IEnumerable<FileInfo> GetAllValuableCsFiles(DirectoryInfo directoryInfo)
         {
             var tokensToFilterOut = new[]
             {
@@ -37,14 +37,13 @@ namespace CleanCode.Helpers
 
             return directoryInfo
                 .GetFiles("*.cs", SearchOption.AllDirectories)
-                .Where(x => !tokensToFilterOut.Any(x.FullName.Contains))
-                .Select(x => x.FullName);
+                .Where(x => !tokensToFilterOut.Any(x.FullName.Contains));
         }
 
-        public static string CalculateFileHash(string filename)
+        public static string CalculateFileHash(FileInfo fileInfo)
         {
             using var md5 = MD5.Create();
-            return BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(filename)));
+            return BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(fileInfo.FullName)));
         }
     }
 }

@@ -6,9 +6,9 @@ namespace CleanCode.Helpers
 {
     public static class Cmd
     {
-        public static Result<None> RunProcess(string command, string args, Action<string> callBack = null)
+        public static Result<None> RunProcess(string command, string commandArgs, Action<string> handleCmdEventLine = null)
         {
-            var startInfo = new ProcessStartInfo(command, args)
+            var startInfo = new ProcessStartInfo(command, commandArgs)
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -18,7 +18,7 @@ namespace CleanCode.Helpers
             using var process = Process.Start(startInfo);
 
             if (process == null)
-                return $"Failed to start command {command} with args {args}'";
+                return $"Failed to start command {command} with commandArgs {commandArgs}'";
 
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
@@ -28,7 +28,7 @@ namespace CleanCode.Helpers
             {
                 var line = args.Data;
                 if (line != null)
-                    callBack(line);
+                    handleCmdEventLine?.Invoke(line);
             };
 
 

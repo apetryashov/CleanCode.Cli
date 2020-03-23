@@ -1,18 +1,17 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
+using JetBrains.Annotations;
 
 namespace CleanCode.Cli.Commands.Cleanup
 {
+    //TODO: нужно добавить ключ --force
+    [PublicAPI]
     [Verb("cleanup", HelpText = "Start ReSharper cleanup tool for given directory")]
-    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class CleanupCommand : ICommand
     {
         [Option('s', "solution",
@@ -25,20 +24,21 @@ namespace CleanCode.Cli.Commands.Cleanup
             .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
             .Then(StartCleanup);
 
-        private Result<None> StartCleanup(FileInfo sln)
+        private static Result<None> StartCleanup(FileInfo sln)
         {
             var changedFiles = FilesHashCacheStorage.GetChangedFiles(sln.Directory);
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
             return ReSharperCodeStyleValidator.Run(sln, changedFiles)
-                .Then(files => FilesHashCacheStorage.UpdateFilesHash(changedFiles))
-                .Then(files => files.Select(file => Path.GetRelativePath(sln.Directory.FullName, file)))
-                .Then(files => FailIfHasDirtyFiles(files.ToList()));
+                .Then(_ => FilesHashCacheStorage.UpdateFilesHash(changedFiles))
+                .Then(files => FailIfHasDirtyFiles(sln.Directory, files));
         }
 
-        private static Result<None> FailIfHasDirtyFiles(IEnumerable<string> dirtyFiles)
+        private static Result<None> FailIfHasDirtyFiles(DirectoryInfo slnDirectory, IEnumerable<FileInfo> dirtyFiles)
         {
-            var allDirtyFilesString = string.Join("\r\n", dirtyFiles);
+            var relativeFiles = dirtyFiles.Select(file => file.GetRelativePath(slnDirectory));
+
+            var allDirtyFilesString = string.Join("\r\n", relativeFiles);
 
             if (string.IsNullOrEmpty(allDirtyFilesString))
             {
