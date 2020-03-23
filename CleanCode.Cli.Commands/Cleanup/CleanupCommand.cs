@@ -21,46 +21,43 @@ namespace CleanCode.Cli.Commands.Cleanup
             HelpText = "Custom path to .sln file. Current directory by default ")]
         public string PathToSlnFolder { get; set; } = ".";
 
-        public Result<None> Run()
-        {
-            return ResharperCltUpdater.UpdateIfNeed()
-                .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
-                .Then(StartCleanup);
-        }
+        public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed()
+            .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
+            .Then(StartCleanup);
 
         private Result<None> StartCleanup(FileInfo sln)
         {
-            var files = FileUtils.GetAllValuableCsFiles(sln.Directory).ToList();
-            var oldFilesHashes = files.ToDictionary(x => x, FileUtils.CalculateFileHash);
+            var oldFilesHashes = FileUtils.GetAllValuableCsFiles(sln.Directory)
+                .ToDictionary(x => x, FileUtils.CalculateFileHash);
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
-            return ReSharperCodeStyleValidator.Run(sln, files)
-                .Then(__ => GetDirtyFiles())
+            return ReSharperCodeStyleValidator.Run(sln, oldFilesHashes.Keys)
+                .Then(__ => GetDirtyFiles(oldFilesHashes))
                 .Then(FailIfHasDirtyFiles);
+        }
 
-            IReadOnlyCollection<string> GetDirtyFiles()
-            {
-                return files.Where(file => !IsCleanFile(file))
-                    .Select(file => file.Remove(0, PathToSlnFolder.Length + 1))
-                    .ToList();
+        private IReadOnlyCollection<string> GetDirtyFiles(IReadOnlyDictionary<string, string> oldFilesHashes)
+        {
+            return oldFilesHashes.Keys.Where(file => !IsCleanFile(file))
+                .Select(file => file.Remove(0, PathToSlnFolder.Length + 1))
+                .ToList();
 
-                bool IsCleanFile(string file)
-                    => oldFilesHashes[file] == FileUtils.CalculateFileHash(file);
-            }
+            bool IsCleanFile(string file)
+                => oldFilesHashes[file] == FileUtils.CalculateFileHash(file);
+        }
 
-            static Result<None> FailIfHasDirtyFiles(IReadOnlyCollection<string> dirtyFiles)
-            {
-                if (dirtyFiles.Any())
-                    return $@"
+        private static Result<None> FailIfHasDirtyFiles(IReadOnlyCollection<string> dirtyFiles)
+        {
+            if (dirtyFiles.Any())
+                return $@"
 Not all files are clean.
 Failed files list:
 {string.Join("\r\n", dirtyFiles)}
 
 You can restart the process and get successful result
 ";
-                ConsoleHelper.LogInfo("All files are clean");
-                return Result.Ok();
-            }
+            ConsoleHelper.LogInfo("All files are clean");
+            return Result.Ok();
         }
     }
 }
