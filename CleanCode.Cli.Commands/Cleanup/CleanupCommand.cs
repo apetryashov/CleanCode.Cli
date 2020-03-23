@@ -27,37 +27,32 @@ namespace CleanCode.Cli.Commands.Cleanup
 
         private Result<None> StartCleanup(FileInfo sln)
         {
-            var oldFilesHashes = FileUtils.GetAllValuableCsFiles(sln.Directory)
-                .ToDictionary(x => x, FileUtils.CalculateFileHash);
+            var changedFiles = FilesHashCacheStorage.GetChangedFiles(sln.Directory);
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
-            return ReSharperCodeStyleValidator.Run(sln, oldFilesHashes.Keys)
-                .Then(__ => GetDirtyFiles(oldFilesHashes))
-                .Then(FailIfHasDirtyFiles);
+            return ReSharperCodeStyleValidator.Run(sln, changedFiles)
+                .Then(files => FilesHashCacheStorage.UpdateFilesHash(changedFiles))
+                .Then(files => files.Select(file => Path.GetRelativePath(sln.Directory.FullName, file)))
+                .Then(files => FailIfHasDirtyFiles(files.ToList()));
         }
 
-        private IReadOnlyCollection<string> GetDirtyFiles(IReadOnlyDictionary<string, string> oldFilesHashes)
+        private static Result<None> FailIfHasDirtyFiles(IEnumerable<string> dirtyFiles)
         {
-            return oldFilesHashes.Keys.Where(file => !IsCleanFile(file))
-                .Select(file => file.Remove(0, PathToSlnFolder.Length + 1))
-                .ToList();
+            var allDirtyFilesString = string.Join("\r\n", dirtyFiles);
 
-            bool IsCleanFile(string file)
-                => oldFilesHashes[file] == FileUtils.CalculateFileHash(file);
-        }
+            if (string.IsNullOrEmpty(allDirtyFilesString))
+            {
+                ConsoleHelper.LogInfo("All files are clean");
+                return Result.Ok();
+            }
 
-        private static Result<None> FailIfHasDirtyFiles(IReadOnlyCollection<string> dirtyFiles)
-        {
-            if (dirtyFiles.Any())
-                return $@"
+            return $@"
 Not all files are clean.
 Failed files list:
-{string.Join("\r\n", dirtyFiles)}
+{allDirtyFilesString}
 
 You can restart the process and get successful result
 ";
-            ConsoleHelper.LogInfo("All files are clean");
-            return Result.Ok();
         }
     }
 }

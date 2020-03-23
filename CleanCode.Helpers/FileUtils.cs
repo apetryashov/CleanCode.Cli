@@ -34,13 +34,12 @@ namespace CleanCode.Helpers
                 $"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}",
                 $"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"
             };
-            
+
             return directoryInfo
                 .GetFiles("*.cs", SearchOption.AllDirectories)
                 .Where(x => !tokensToFilterOut.Any(x.FullName.Contains))
                 .Select(x => x.FullName);
         }
-        
 
         public static string CalculateFileHash(string filename)
         {
