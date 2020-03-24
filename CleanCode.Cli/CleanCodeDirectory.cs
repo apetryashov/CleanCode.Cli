@@ -3,6 +3,7 @@ using System.IO;
 
 namespace CleanCode.Cli
 {
+    //TODO: лучше уйти от статики
     public class CleanCodeDirectory : ICliDirectory
     {
         private const string DirectoryName = ".clean-code";
