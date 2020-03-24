@@ -6,7 +6,7 @@ namespace CleanCode.Helpers
 {
     public static class ReSharperClt
     {
-        private static string ReSharperCleanupCodeCli
+        private static string ReSharperInspectCodeCli
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\inspectcode.exe");
 
         private static string PathToTransformSettings
@@ -15,9 +15,9 @@ namespace CleanCode.Helpers
         private static string PathToXsltFile
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt");
 
-        public static Result<None> RunCleanupCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
+        public static Result<None> RunInspectCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
             => Cmd.RunProcess(
-                ReSharperCleanupCodeCli,
+                ReSharperInspectCodeCli,
                 $"{pathToSlnFile} --o={outFile}",
                 callBack);
 

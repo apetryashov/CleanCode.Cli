@@ -2,54 +2,65 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CleanCode.Helpers;
-using Newtonsoft.Json;
+using JetBrains.Annotations;
+using LiteDB;
 
 namespace CleanCode.Cli.Commands
 {
-    public static class FilesHashCacheStorage //TODO: переделать на работу с какой-нибудь базой или еще что
+    //TODO: тут можно прибраться скорее всего
+    public static class FilesHashCacheStorage
     {
-        private static readonly IDictionary<string, string> FilesHashCache = ReadHashes();
+        private const string CacheCollectionName = "Cache";
+        private static readonly string ConnectionString = CleanCodeDirectory.GetWithSubDirectory("MyCache.db");
 
         public static IReadOnlyCollection<FileInfo> GetChangedFiles(DirectoryInfo directory)
         {
+            using var db = new LiteDatabase(ConnectionString);
+            var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
+
             return FileUtils.GetAllValuableCsFiles(directory)
                 .Select(fileInfo => (fileInfo, hash: FileUtils.CalculateFileHash(fileInfo)))
                 .Where(x => IsChangedFile(x.fileInfo, x.hash))
                 .Select(x => x.fileInfo)
                 .ToList();
 
-            static bool IsChangedFile(FileSystemInfo fileInfo, string fileHash)
-            {
-                if (!FilesHashCache.TryGetValue(fileInfo.FullName, out var currentHash))
-                    return true;
-
-                return currentHash != fileHash;
-            }
-        }
-
-        private static IDictionary<string, string> ReadHashes()
-        {
-            if (!File.Exists("filesHash"))
-                return new Dictionary<string, string>();
-
-            var changedFile = File.ReadAllText("filesHash");
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(changedFile);
+            bool IsChangedFile(FileSystemInfo fileInfo, string fileHash) => collection.FindOne(x =>
+                x.FilePath == fileInfo.FullName &&
+                x.Hash == fileHash) == null;
         }
 
         public static IEnumerable<FileInfo> UpdateFilesHash(IEnumerable<FileInfo> files)
         {
-            foreach (var file in files)
+            using var db = new LiteDatabase(ConnectionString);
+            var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
+
+            var changedFiles = files.Select(file => new FileWithHash
             {
-                var currentHash = FileUtils.CalculateFileHash(file);
-                if (FilesHashCache.TryGetValue(file.FullName, out var hash) && hash != currentHash)
-                    yield return file;
+                FilePath = file.FullName,
+                Hash = FileUtils.CalculateFileHash(file)
+            }).Where(x =>
+            {
+                return collection.Include(file =>
+                    file.FilePath == x.FilePath &&
+                    file.Hash == x.Hash) == null;
+            }).ToList();
 
-                FilesHashCache[file.FullName] = FileUtils.CalculateFileHash(file);
-            }
+            collection.Upsert(changedFiles);
 
-            var serializeObject = JsonConvert.SerializeObject(FilesHashCache);
+            return changedFiles.Select(x => new FileInfo(x.FilePath));
+        }
 
-            File.WriteAllText("filesHash", serializeObject);
+        public static void ClearCache()
+        {
+            using var db = new LiteDatabase(ConnectionString);
+            db.DropCollection(CacheCollectionName);
+        }
+
+        [PublicAPI]
+        private class FileWithHash
+        {
+            [BsonId] public string? FilePath { get; set; }
+            public string? Hash { get; set; }
         }
     }
 }

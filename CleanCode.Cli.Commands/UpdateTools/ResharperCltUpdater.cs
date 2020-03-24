@@ -13,7 +13,6 @@ using Newtonsoft.Json.Linq;
 namespace CleanCode.Cli.Commands.UpdateTools
 {
     //TODO: тут тоже нужно рефакторить
-    //TODO: очищать кэш при установке новой версии
     [PublicAPI]
     [Verb("update", HelpText = "Check new resharper-clt version and install if need")]
     public static class ResharperCltUpdater
@@ -35,7 +34,12 @@ namespace CleanCode.Cli.Commands.UpdateTools
             }
 
             return Update(downloadUrl)
-                .Then(_ => UpdateState(version));
+                .Then(_ => UpdateState(version))
+                .Then(_ =>
+                {
+                    FilesHashCacheStorage.ClearCache();
+                    ConsoleHelper.LogInfo("File hashes were removed :(");
+                });
         }
 
         private static bool NeedUpdate(string currentVersion)
@@ -69,7 +73,7 @@ namespace CleanCode.Cli.Commands.UpdateTools
             var tempFileName = $"{Guid.NewGuid()}.zip";
             var fileName = Path.Combine(tempDir.PathToTempDirectory, tempFileName);
             client.DownloadFile(downloadUrl, fileName);
-            ZipFile.ExtractToDirectory(fileName, ToolDir, Encoding.Default);
+            ZipFile.ExtractToDirectory(fileName, ToolDir, Encoding.Default, true);
 
             return Result.Ok();
         }

@@ -39,7 +39,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
                     ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
 
-                    return ReSharperClt.RunCleanupCodeTool(tempFile, sln.FullName, progressBar.RegisterFile)
+                    return ReSharperClt.RunInspectCodeTool(tempFile, sln.FullName, progressBar.RegisterFile)
                         .Then(_ => ConsoleHelper.ClearCurrentConsoleLine())
                         .Then(_ => CheckXmlReport(tempFile))
                         .Then(_ => ConsoleHelper.LogInfo("All files are clean"));
