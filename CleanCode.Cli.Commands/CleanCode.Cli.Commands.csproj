@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
+      <ProjectReference Include="..\CleanCode.Cli.Common\CleanCode.Cli.Common.csproj" />
       <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
       <ProjectReference Include="..\CleanCode.Results\CleanCode.Results.csproj" />
     </ItemGroup>

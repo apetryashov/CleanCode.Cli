@@ -17,7 +17,7 @@ namespace CleanCode.Helpers
             Console.WriteLine($"[INFO] {infoMessage}");
         }
 
-        public static void LogWithTag(string tag, string message, bool withNewLine = true)
+        public static void LazyLog(string tag, string message)
         {
             ClearCurrentConsoleLine();
             var currentColor = Console.ForegroundColor;
@@ -25,9 +25,6 @@ namespace CleanCode.Helpers
             Console.Write($"[{tag}] ");
             Console.ForegroundColor = currentColor;
             Console.Write(message);
-
-            if (withNewLine)
-                Console.WriteLine();
         }
 
         public static void ClearCurrentConsoleLine()

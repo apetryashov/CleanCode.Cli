@@ -1,8 +1,11 @@
 using System;
-using CleanCode.Cli;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using CleanCode.Cli.Common;
+using CleanCode.Helpers;
 using CleanCode.Results;
 
-namespace CleanCode.Helpers
+namespace CleanCode.Cli.Commands
 {
     public static class ReSharperClt
     {
@@ -14,6 +17,9 @@ namespace CleanCode.Helpers
 
         private static string PathToXsltFile
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt");
+        
+        private static string ReSharperCleanupCodeCli
+            => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\cleanupcode.exe");
 
         public static Result<None> RunInspectCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
             => Cmd.RunProcess(
@@ -26,5 +32,11 @@ namespace CleanCode.Helpers
                 "powershell",
                 $"{PathToTransformSettings} {pathToXmlReport} {PathToXsltFile} code-inspections.html"
             );
+
+        public static Result<None> RunCleanupTool(string pathToSlnFile, IEnumerable<string> relativeFilePaths, Action<string> callBack) => Cmd.RunProcess(
+            ReSharperCleanupCodeCli,
+            $"{pathToSlnFile} --include=\"{string.Join(';', relativeFilePaths)}\"",
+            callBack
+        );
     }
 }

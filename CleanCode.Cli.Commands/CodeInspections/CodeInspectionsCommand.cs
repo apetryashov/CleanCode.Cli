@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using CleanCode.Cli.Commands.UpdateTools;
+using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;

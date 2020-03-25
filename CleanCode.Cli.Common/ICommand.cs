@@ -1,6 +1,6 @@
 using CleanCode.Results;
 
-namespace CleanCode.Cli.Commands
+namespace CleanCode.Cli.Common
 {
     public interface ICommand
     {

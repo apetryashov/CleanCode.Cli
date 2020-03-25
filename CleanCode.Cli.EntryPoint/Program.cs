@@ -1,4 +1,5 @@
-﻿using CleanCode.Cli.Commands;
+﻿using CleanCode.Cli;
+using CleanCode.Cli.Commands;
 
 namespace CleanCode.Tool
 {

@@ -1,4 +1,4 @@
-namespace CleanCode.Cli
+namespace CleanCode.Cli.Common
 {
     public interface ICliDirectory
     {

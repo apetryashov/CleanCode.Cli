@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CleanCode.Cli.Commands.UpdateTools;
+using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
@@ -38,7 +40,7 @@ namespace CleanCode.Cli.Commands.Cleanup
         {
             var relativeFiles = dirtyFiles.Select(file => file.GetRelativePath(slnDirectory));
 
-            var allDirtyFilesString = string.Join("\r\n", relativeFiles);
+            var allDirtyFilesString = string.Join(Environment.NewLine, relativeFiles);
 
             if (string.IsNullOrEmpty(allDirtyFilesString))
             {

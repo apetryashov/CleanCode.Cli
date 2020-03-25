@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using CleanCode.Cli.Commands.Cleanup;
 using CleanCode.Cli.Commands.CodeInspections;
 using CleanCode.Cli.Commands.UpdateTools;
+using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
 
-namespace CleanCode.Cli.Commands
+namespace CleanCode.Cli
 {
     public static class CommandProvider
     {

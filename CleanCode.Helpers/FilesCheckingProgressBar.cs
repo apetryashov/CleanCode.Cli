@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,9 +26,8 @@ namespace CleanCode.Helpers
             var currentFile = match.Value;
             if (!uncheckedFiles.Contains(currentFile))
                 return;
-
             uncheckedFiles.Remove(currentFile);
-            ConsoleHelper.LogWithTag($"{totalFiles - uncheckedFiles.Count}\\{totalFiles}", currentFile, false);
+            ConsoleHelper.LazyLog($"{totalFiles - uncheckedFiles.Count}\\{totalFiles}", currentFile);
         }
     }
 }

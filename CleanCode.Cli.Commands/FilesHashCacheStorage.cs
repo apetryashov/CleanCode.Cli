@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using JetBrains.Annotations;
 using LiteDB;
@@ -8,14 +10,14 @@ using LiteDB;
 namespace CleanCode.Cli.Commands
 {
     //TODO: тут можно прибраться скорее всего
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public static class FilesHashCacheStorage
     {
         private const string CacheCollectionName = "Cache";
-        private static readonly string ConnectionString = CleanCodeDirectory.GetWithSubDirectory("MyCache.db");
 
         public static IReadOnlyCollection<FileInfo> GetChangedFiles(DirectoryInfo directory)
         {
-            using var db = new LiteDatabase(ConnectionString);
+            using var db = LiteDbHelper.DataBase;
             var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
 
             return FileUtils.GetAllValuableCsFiles(directory)
@@ -31,7 +33,7 @@ namespace CleanCode.Cli.Commands
 
         public static IEnumerable<FileInfo> UpdateFilesHash(IEnumerable<FileInfo> files)
         {
-            using var db = new LiteDatabase(ConnectionString);
+            using var db = LiteDbHelper.DataBase;
             var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
 
             var changedFiles = files.Select(file => new FileWithHash
@@ -52,7 +54,7 @@ namespace CleanCode.Cli.Commands
 
         public static void ClearCache()
         {
-            using var db = new LiteDatabase(ConnectionString);
+            using var db = LiteDbHelper.DataBase;
             db.DropCollection(CacheCollectionName);
         }
 

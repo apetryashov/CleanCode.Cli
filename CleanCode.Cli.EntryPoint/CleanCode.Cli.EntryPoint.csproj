@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
+      <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
       <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
     </ItemGroup>
 

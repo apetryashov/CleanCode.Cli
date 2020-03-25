@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace CleanCode.Cli
+namespace CleanCode.Cli.Common
 {
     //TODO: лучше уйти от статики
     public class CleanCodeDirectory : ICliDirectory

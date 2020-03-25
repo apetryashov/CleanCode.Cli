@@ -1,6 +1,6 @@
+using CleanCode.Cli.Common;
 using CleanCode.Results;
 using JetBrains.Annotations;
-
 namespace CleanCode.Cli.Commands.UpdateTools
 {
     [PublicAPI]

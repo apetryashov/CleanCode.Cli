@@ -6,7 +6,8 @@ namespace CleanCode.Helpers
 {
     public static class Cmd
     {
-        public static Result<None> RunProcess(string command, string commandArgs, Action<string> handleCmdEventLine = null)
+        public static Result<None> RunProcess(string command, string commandArgs,
+            Action<string> handleCmdEventLine = null)
         {
             var startInfo = new ProcessStartInfo(command, commandArgs)
             {
@@ -22,15 +23,14 @@ namespace CleanCode.Helpers
 
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
-            
+
             process.OutputDataReceived +=
                 (sender, args) =>
-            {
-                var line = args.Data;
-                if (line != null)
-                    handleCmdEventLine?.Invoke(line);
-            };
-
+                {
+                    var line = args.Data;
+                    if (line != null)
+                        handleCmdEventLine?.Invoke(line);
+                };
 
             process.WaitForExit();
 
