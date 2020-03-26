@@ -7,6 +7,7 @@ using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
+using CommandLine.Text;
 using JetBrains.Annotations;
 
 namespace CleanCode.Cli.Commands.Cleanup
@@ -18,21 +19,35 @@ namespace CleanCode.Cli.Commands.Cleanup
     {
         [Option('s', "solution",
             Required = false,
-            Default = ".",
             HelpText = "Custom path to .sln file. Current directory by default ")]
-        public string PathToSlnFolder { get; set; } = ".";
+        public string? PathToSlnFolder { get; set; }
+        
+        [Option('f', "force",
+            Required = false,
+            HelpText = "State force cleanup. It is slow but will check all files again")]
+        public bool Force { get; set; }
+        
+        [Usage(ApplicationAlias = "clean-code")]
+        public static IEnumerable<Example> Examples => new List<Example>() {
+            new Example("Start cleanup in current directory", new CleanupCommand()),
+            new Example("Start cleanup in given directory", new CleanupCommand{PathToSlnFolder = "path/to/directory/with.sln"}),
+            new Example("Start cleanup without cache", new CleanupCommand{Force = true}),
+        };
 
         public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed()
-            .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
+            .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder ?? Directory.GetCurrentDirectory()))
             .Then(StartCleanup);
 
-        private static Result<None> StartCleanup(FileInfo sln)
+        private Result<None> StartCleanup(FileInfo sln)
         {
-            var changedFiles = FilesHashCacheStorage.GetChangedFiles(sln.Directory);
+            var scannedFiles = Force 
+                ? FileUtils.GetAllValuableCsFiles(sln.Directory)
+                : FilesHashCacheStorage.GetChangedFiles(sln.Directory);
+            
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
-            return ReSharperCodeStyleValidator.Run(sln, changedFiles)
-                .Then(_ => FilesHashCacheStorage.UpdateFilesHash(changedFiles))
+            return ReSharperCodeStyleValidator.Run(sln, scannedFiles)
+                .Then(_ => FilesHashCacheStorage.UpdateFilesHash(scannedFiles))
                 .Then(files => FailIfHasDirtyFiles(sln.Directory, files));
         }
 
