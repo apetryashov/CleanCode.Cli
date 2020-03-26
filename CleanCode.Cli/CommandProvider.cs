@@ -9,7 +9,7 @@ using CommandLine;
 
 namespace CleanCode.Cli
 {
-    public static class CommandProvider
+    public static class CommandProvider //TODO: Научиться нормально форматировать help
     {
         public static void StartCommand(IEnumerable<string> args)
         {
