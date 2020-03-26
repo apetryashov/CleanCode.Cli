@@ -5,7 +5,6 @@ using System.Linq;
 using CleanCode.Helpers;
 using JetBrains.Annotations;
 using LiteDB;
-using Newtonsoft.Json.Serialization;
 
 namespace CleanCode.Cli.Commands
 {

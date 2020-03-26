@@ -12,7 +12,6 @@ using JetBrains.Annotations;
 
 namespace CleanCode.Cli.Commands.Cleanup
 {
-    //TODO: нужно добавить ключ --force
     [PublicAPI]
     [Verb("cleanup", HelpText = "Start ReSharper cleanup tool for given directory")]
     public class CleanupCommand : ICommand
@@ -21,18 +20,11 @@ namespace CleanCode.Cli.Commands.Cleanup
             Required = false,
             HelpText = "Custom path to .sln file. Current directory by default ")]
         public string? PathToSlnFolder { get; set; }
-        
+
         [Option('f', "force",
             Required = false,
             HelpText = "State force cleanup. It is slow but will check all files again")]
         public bool Force { get; set; }
-        
-        [Usage(ApplicationAlias = "clean-code")]
-        public static IEnumerable<Example> Examples => new List<Example>() {
-            new Example("Start cleanup in current directory", new CleanupCommand()),
-            new Example("Start cleanup in given directory", new CleanupCommand{PathToSlnFolder = "path/to/directory/with.sln"}),
-            new Example("Start cleanup without cache", new CleanupCommand{Force = true}),
-        };
 
         public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed()
             .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder ?? Directory.GetCurrentDirectory()))
@@ -40,10 +32,10 @@ namespace CleanCode.Cli.Commands.Cleanup
 
         private Result<None> StartCleanup(FileInfo sln)
         {
-            var scannedFiles = Force 
+            var scannedFiles = Force
                 ? FileUtils.GetAllValuableCsFiles(sln.Directory)
                 : FilesHashCacheStorage.GetChangedFiles(sln.Directory);
-            
+
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
             return ReSharperCodeStyleValidator.Run(sln, scannedFiles)
@@ -71,5 +63,18 @@ Failed files list:
 You can restart the process and get successful result
 ";
         }
+
+        #region Examples
+
+        [Usage(ApplicationAlias = "clean-code")]
+        public static IEnumerable<Example> Examples => new List<Example>()
+        {
+            new Example("Start cleanup in current directory", new CleanupCommand()),
+            new Example("Start cleanup in given directory",
+                new CleanupCommand {PathToSlnFolder = "<path to .sln file>"}),
+            new Example("Start cleanup without cache", new CleanupCommand {Force = true}),
+        };
+
+        #endregion
     }
 }
