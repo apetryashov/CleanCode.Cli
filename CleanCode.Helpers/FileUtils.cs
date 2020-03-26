@@ -27,7 +27,7 @@ namespace CleanCode.Helpers
             return slnFiles.First();
         }
 
-        public static IEnumerable<FileInfo> GetAllValuableCsFiles(DirectoryInfo directoryInfo)
+        public static IReadOnlyCollection<FileInfo> GetAllValuableCsFiles(DirectoryInfo directoryInfo)
         {
             var tokensToFilterOut = new[]
             {
@@ -37,7 +37,8 @@ namespace CleanCode.Helpers
 
             return directoryInfo
                 .GetFiles("*.cs", SearchOption.AllDirectories)
-                .Where(x => !tokensToFilterOut.Any(x.FullName.Contains));
+                .Where(x => !tokensToFilterOut.Any(x.FullName.Contains))
+                .ToList();
         }
 
         public static string CalculateFileHash(FileInfo fileInfo)

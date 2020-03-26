@@ -12,7 +12,6 @@ using JetBrains.Annotations;
 
 namespace CleanCode.Cli.Commands.CodeInspections
 {
-    //TODO: кажется, что это можно декомпозировать
     [PublicAPI]
     [Verb("code-inspections", HelpText = "Start ReSharper code-inspection tool for given directory")]
     public class CodeInspectionsCommand : ICommand
@@ -24,7 +23,6 @@ namespace CleanCode.Cli.Commands.CodeInspections
         public string PathToSlnFolder { get; set; } = ".";
 
         private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
-
 
         public Result<None> Run()
         {
@@ -40,7 +38,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
                     ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
 
-                    return ReSharperClt.RunInspectCodeTool(tempFile, sln.FullName, progressBar.RegisterFile)
+                    return ReSharperClt.RunInspectCodeTool(sln.FullName, tempFile, progressBar.RegisterFile)
                         .Then(_ => ConsoleHelper.ClearCurrentConsoleLine())
                         .Then(_ => CheckXmlReport(tempFile))
                         .Then(_ => ConsoleHelper.LogInfo("All files are clean"));
@@ -54,7 +52,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
             if (!failFiles.Any())
                 return Result.Ok();
 
-            return ReSharperClt.ConvertXmlReportToHtml(pathToXmlReport)
+            return CodeInspectionToolHelpers.ConvertXmlReportToHtml(pathToXmlReport)
                 .Then(_ => GetErrorFilesAsFailResult());
 
             Result<None> GetErrorFilesAsFailResult()
