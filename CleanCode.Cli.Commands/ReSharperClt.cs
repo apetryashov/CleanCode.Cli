@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;

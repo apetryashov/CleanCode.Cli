@@ -12,7 +12,7 @@ using CommandLine.Text;
 
 namespace CleanCode.Cli
 {
-    public static class CommandProvider //TODO: Научиться нормально форматировать help
+    public static class CommandProvider
     {
         private static readonly string[] DefaultArgs = {"--help"};
 
@@ -20,7 +20,11 @@ namespace CleanCode.Cli
         {
             args = args.Any() ? args : DefaultArgs;
 
-            var parserResult = new Parser(with => with.HelpWriter = null)
+            var parserResult = new Parser(with =>
+                {
+                    with.IgnoreUnknownArguments = false;
+                    with.HelpWriter = null;
+                })
                 .ParseArguments<CleanupCommand, CodeInspectionsCommand, UpdateToolCommand>(args);
 
             parserResult
@@ -28,18 +32,20 @@ namespace CleanCode.Cli
                 .WithNotParsed(errs => DisplayHelp(parserResult, errs));
         }
 
-        static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> _)
+        private static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> _)
         {
             var helpText = HelpText.AutoBuild(result, h => new HelpText
                     {
                         AdditionalNewLineAfterOption = false,
                         AddDashesToOption = true,
                         MaximumDisplayWidth = 100,
-                        AutoVersion = false
-                    }.AddPreOptionsLine("Info:")
+                        AutoVersion = false,
+                    }
+                    .AddPreOptionsLine("Info:")
                     .AddPostOptionsLine($"{CopyrightInfo.Default}"),
                 e => e,
                 true);
+
             Console.WriteLine(helpText.ToString().Trim());
         }
 
@@ -48,25 +54,5 @@ namespace CleanCode.Cli
             command.Run()
                 .OnFail(ConsoleHelper.LogError);
         }
-    }
-
-    class Options
-    {
-        [Option('r', "read", Required = false, HelpText = "Input files to be processed.")]
-        public IEnumerable<string> InputFiles { get; set; }
-
-        // Omitting long name, defaults to name of property, ie "--verbose"
-        [Option(
-            Default = false,
-            HelpText = "Prints all messages to standard output.")]
-        public bool Verbose { get; set; }
-
-        [Option("stdin",
-            Default = false,
-            HelpText = "Read from stdin")]
-        public bool stdin { get; set; }
-
-        [Value(0, MetaName = "offset", HelpText = "File offset.")]
-        public long? Offset { get; set; }
     }
 }

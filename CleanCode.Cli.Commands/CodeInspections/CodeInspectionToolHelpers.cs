@@ -12,10 +12,10 @@ namespace CleanCode.Cli.Commands.CodeInspections
         private static string PathToXsltFile
             => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt");
 
-        public static Result<None> ConvertXmlReportToHtml(string pathToXmlReport)
+        public static Result<None> ConvertXmlReportToHtml(string pathToXmlReport, string outFileName)
             => Cmd.RunProcess(
                 "powershell",
-                $"{PathToTransformSettings} {pathToXmlReport} {PathToXsltFile} code-inspections.html"
+                $"{PathToTransformSettings} {pathToXmlReport} {PathToXsltFile} {outFileName}"
             );
     }
 }
