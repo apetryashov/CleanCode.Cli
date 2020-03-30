@@ -13,11 +13,11 @@ namespace CleanCode.Cli.Commands.UpdateTools
         private static readonly string ToolDir = CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt");
         private const string StateCollectionName = "State";
 
-        public static Result<None> UpdateIfNeed()
+        public static Result<None> UpdateIfNeed(bool force = false)
         {
             var meta = ResharperCltHelper.GetInformationAboutLastVersion();
 
-            if (!NeedUpdate(meta.Version))
+            if (!force && !NeedUpdate(meta.Version))
             {
                 ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
                 return Result.Ok();
