@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Company>Mopozko</Company>
+        <Company>@apetryashov</Company>
         <Version>0.0.1-beta</Version>
         <AssemblyTitle>clean-code</AssemblyTitle>
     </PropertyGroup>
