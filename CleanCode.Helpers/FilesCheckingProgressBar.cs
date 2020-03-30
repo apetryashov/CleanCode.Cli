@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace CleanCode.Helpers
 {
-    public class FilesCheckingProgressBar //TODO: это все же нужно переделать
+    public class FilesCheckingProgressBar
     {
         private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
         private readonly HashSet<string> uncheckedFiles;
