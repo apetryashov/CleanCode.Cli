@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml;
 using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Cli.Common;
@@ -14,16 +13,8 @@ namespace CleanCode.Cli.Commands.CodeInspections
 {
     [PublicAPI]
     [Verb("code-inspections", HelpText = "Start ReSharper code-inspection tool for given directory")]
-    public class CodeInspectionsCommand : ICommand
+    public class CodeInspectionsCommand : CodeInspectionsCommandOptions, ICommand
     {
-        [Option('s', "solution",
-            Required = false,
-            Default = ".",
-            HelpText = "Custom path to .sln file. Current directory by default ")]
-        public string PathToSlnFolder { get; set; } = ".";
-
-        private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
-
         public Result<None> Run()
         {
             var files = FileUtils.GetAllValuableCsFiles(new DirectoryInfo(PathToSlnFolder)).ToList();
@@ -39,20 +30,24 @@ namespace CleanCode.Cli.Commands.CodeInspections
                     ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
 
                     return ReSharperClt.RunInspectCodeTool(sln.FullName, tempFile, progressBar.RegisterFile)
-                        .Then(_ => ConsoleHelper.ClearCurrentConsoleLine())
                         .Then(_ => CheckXmlReport(tempFile))
-                        .Then(_ => ConsoleHelper.LogInfo("All files are clean"));
+                        .Then(_ => ConsoleHelper.LogInfo("All files are clean"))
+                        .OnFail(error =>
+                        {
+                            if (Interactive)
+                                Cmd.RunProcess("explorer", "code-inspections.html");
+                        });
                 });
         }
 
-        private static Result<None> CheckXmlReport(string pathToXmlReport)
+        private Result<None> CheckXmlReport(string pathToXmlReport)
         {
             var failFiles = GetFailFilesFromXmlReport(pathToXmlReport);
 
             if (!failFiles.Any())
                 return Result.Ok();
 
-            return CodeInspectionToolHelpers.ConvertXmlReportToHtml(pathToXmlReport)
+            return CodeInspectionToolHelpers.ConvertXmlReportToHtml(pathToXmlReport, OutFileName)
                 .Then(_ => GetErrorFilesAsFailResult());
 
             Result<None> GetErrorFilesAsFailResult()
