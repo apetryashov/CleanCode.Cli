@@ -3,25 +3,16 @@ using System.IO;
 
 namespace CleanCode.Cli.Common
 {
-    //TODO: лучше уйти от статики
-    public class CleanCodeDirectory : ICliDirectory
+    public class CleanCodeDirectory : IDirectory
     {
         private const string DirectoryName = ".clean-code";
 
         private static readonly bool OsIsUnix = Environment.OSVersion.Platform == PlatformID.Unix;
 
-        public static string GetWithSubDirectory(string subdirectory)
-        {
-            return Path.Combine(HomeDirectory, DirectoryName, subdirectory);
-        }
-
         private static string HomeDirectory => OsIsUnix
             ? Environment.GetEnvironmentVariable("HOME")
             : Environment.GetEnvironmentVariable("USERPROFILE");
 
-        public string GetDirectory()
-        {
-            return Path.Combine(HomeDirectory, DirectoryName);
-        }
+        public string GetPath() => Path.Combine(HomeDirectory, DirectoryName);
     }
 }

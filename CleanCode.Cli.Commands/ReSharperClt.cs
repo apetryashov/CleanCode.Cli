@@ -6,23 +6,28 @@ using CleanCode.Results;
 
 namespace CleanCode.Cli.Commands
 {
-    public static class ReSharperClt
+    public class ReSharperClt
     {
-        private static string ReSharperInspectCodeCli
-            => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\inspectcode.exe");
+        private readonly IDirectory rootDirectory;
 
-        private static string ReSharperCleanupCodeCli
-            => CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt\\cleanupcode.exe");
+        private IDirectory ReSharperInspectCodeCli
+            => rootDirectory.WithSubDirectory("Tools\\resharper-clt\\inspectcode.exe");
 
-        public static Result<None> RunInspectCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
+        private IDirectory ReSharperCleanupCodeCli
+            => rootDirectory.WithSubDirectory("Tools\\resharper-clt\\cleanupcode.exe");
+
+
+        public ReSharperClt(IDirectory rootDirectory) => this.rootDirectory = rootDirectory;
+
+        public Result<None> RunInspectCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
             => Cmd.RunProcess(
-                ReSharperInspectCodeCli,
+                ReSharperInspectCodeCli.GetPath(),
                 $"{pathToSlnFile} --o={outFile}",
                 callBack);
 
-        public static Result<None> RunCleanupTool(string pathToSlnFile, IEnumerable<string> relativeFilePaths,
+        public Result<None> RunCleanupTool(string pathToSlnFile, IEnumerable<string> relativeFilePaths,
             Action<string> callBack) => Cmd.RunProcess(
-            ReSharperCleanupCodeCli,
+            ReSharperCleanupCodeCli.GetPath(),
             $"{pathToSlnFile} --include=\"{string.Join(';', relativeFilePaths)}\"",
             callBack
         );

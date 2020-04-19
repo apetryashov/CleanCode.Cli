@@ -8,12 +8,16 @@ namespace CleanCode.Cli.Commands.UpdateTools
 {
     [PublicAPI]
     [Verb("update", HelpText = "Check new resharper-clt version and install if need")]
-    public static class ResharperCltUpdater
+    public class ResharperCltUpdater
     {
-        private static readonly string ToolDir = CleanCodeDirectory.GetWithSubDirectory("Tools\\resharper-clt");
+        private readonly IDirectory rootDirectory;
+        private IDirectory ToolDir => rootDirectory.WithSubDirectory("Tools\\resharper-clt");
+
         private const string StateCollectionName = "State";
 
-        public static Result<None> UpdateIfNeed(bool force = false)
+        public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
+
+        public Result<None> UpdateIfNeed(bool force = false)
         {
             var meta = ResharperCltHelper.GetInformationAboutLastVersion();
 
@@ -27,8 +31,9 @@ namespace CleanCode.Cli.Commands.UpdateTools
             return Update(meta);
         }
 
-        public static Result<None> Update(ReSharperCltToolMeta meta) => ZipHelper.DownloadAndExtractZipFile(meta.Version, ToolDir)
-            .Then(_ => UpdateState(meta.DownloadUrl))
+        public Result<None> Update(ReSharperCltToolMeta meta) => ZipHelper
+            .DownloadAndExtractZipFile(meta.DownloadUrl, ToolDir.GetPath())
+            .Then(_ => UpdateState(meta.Version))
             .Then(_ =>
             {
                 FilesHashCacheStorage.ClearCache();

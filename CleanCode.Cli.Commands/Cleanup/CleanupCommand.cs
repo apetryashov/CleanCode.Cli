@@ -8,6 +8,7 @@ using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
 using JetBrains.Annotations;
+using Directory = System.IO.Directory;
 
 namespace CleanCode.Cli.Commands.Cleanup
 {
@@ -15,7 +16,12 @@ namespace CleanCode.Cli.Commands.Cleanup
     [Verb("cleanup", HelpText = "Start ReSharper cleanup tool for given directory")]
     public class CleanupCommand : CleanupCommandOptions, ICommand
     {
-        public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed()
+        private readonly IDirectory cliDirectory;
+
+        public CleanupCommand() => cliDirectory = new CleanCodeDirectory();
+
+        public Result<None> Run() => new ResharperCltUpdater()
+            .UpdateIfNeed()
             .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder ?? Directory.GetCurrentDirectory()))
             .Then(StartCleanup);
 
@@ -27,7 +33,8 @@ namespace CleanCode.Cli.Commands.Cleanup
 
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
-            return ReSharperCodeStyleValidator.Run(sln, scannedFiles)
+            return new ReSharperCodeStyleValidator(cliDirectory)
+                .Run(sln, scannedFiles)
                 .Then(_ => FilesHashCacheStorage.UpdateFilesHash(scannedFiles))
                 .Then(files => FailIfHasDirtyFiles(sln.Directory, files));
         }

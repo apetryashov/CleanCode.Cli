@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CleanCode.Cli.Commands.Cleanup;
 using CleanCode.Cli.Commands.CodeInspections;
+using CleanCode.Cli.Commands.GenerateDotSettings;
 using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Cli.Common;
 using CleanCode.Helpers;
@@ -12,11 +13,19 @@ using CommandLine.Text;
 
 namespace CleanCode.Cli
 {
-    public static class CommandProvider
+    public class CommandProvider
     {
         private static readonly string[] DefaultArgs = {"--help"};
 
-        public static void StartCommand(string[] args)
+        private readonly Type[] commands =
+        {
+            typeof(CleanupCommand),
+            typeof(CodeInspectionsCommand),
+            typeof(GenerateDotSettingsCommand),
+            typeof(UpdateToolCommand),
+        };
+
+        public void StartCommand(string[] args)
         {
             args = args.Any() ? args : DefaultArgs;
 
@@ -25,7 +34,7 @@ namespace CleanCode.Cli
                     with.IgnoreUnknownArguments = false;
                     with.HelpWriter = null;
                 })
-                .ParseArguments<CleanupCommand, CodeInspectionsCommand, UpdateToolCommand>(args);
+                .ParseArguments(args, commands);
 
             parserResult
                 .WithParsed<ICommand>(ExecuteCommand)
@@ -39,7 +48,7 @@ namespace CleanCode.Cli
                         AdditionalNewLineAfterOption = false,
                         AddDashesToOption = true,
                         MaximumDisplayWidth = 100,
-                        AutoVersion = false,
+                        AutoVersion = false
                     }
                     .AddPreOptionsLine("Info:")
                     .AddPostOptionsLine($"{CopyrightInfo.Default}"),
@@ -49,10 +58,8 @@ namespace CleanCode.Cli
             Console.WriteLine(helpText.ToString().Trim());
         }
 
-        private static void ExecuteCommand(ICommand command)
-        {
-            command.Run()
-                .OnFail(ConsoleHelper.LogError);
-        }
+        private static void ExecuteCommand(ICommand command) => command
+            .Run()
+            .OnFail(ConsoleHelper.LogError);
     }
 }

@@ -15,12 +15,15 @@ namespace CleanCode.Cli.Commands.CodeInspections
     [Verb("code-inspections", HelpText = "Start ReSharper code-inspection tool for given directory")]
     public class CodeInspectionsCommand : CodeInspectionsCommandOptions, ICommand
     {
+        private readonly IDirectory rootDirectory = new CleanCodeDirectory();
+        
         public Result<None> Run()
         {
             var files = FileUtils.GetAllValuableCsFiles(new DirectoryInfo(PathToSlnFolder)).ToList();
             var progressBar = new FilesCheckingProgressBar(files);
 
-            return ResharperCltUpdater.UpdateIfNeed()
+            return new ResharperCltUpdater()
+                .UpdateIfNeed()
                 .Then(_ => FileUtils.GetPathToSlnFile(PathToSlnFolder))
                 .Then(sln =>
                 {
@@ -29,7 +32,8 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
                     ConsoleHelper.LogInfo("Start code inspection. Please waiting.");
 
-                    return ReSharperClt.RunInspectCodeTool(sln.FullName, tempFile, progressBar.RegisterFile)
+                    return new ReSharperClt(rootDirectory)
+                        .RunInspectCodeTool(sln.FullName, tempFile, progressBar.RegisterFile)
                         .Then(_ => CheckXmlReport(tempFile))
                         .Then(_ => ConsoleHelper.LogInfo("All files are clean"))
                         .OnFail(error =>
@@ -47,7 +51,8 @@ namespace CleanCode.Cli.Commands.CodeInspections
             if (!failFiles.Any())
                 return Result.Ok();
 
-            return CodeInspectionToolHelpers.ConvertXmlReportToHtml(pathToXmlReport, OutFileName)
+            return new CodeInspectionToolHelpers(rootDirectory)
+                .ConvertXmlReportToHtml(pathToXmlReport, OutFileName)
                 .Then(_ => GetErrorFilesAsFailResult());
 
             Result<None> GetErrorFilesAsFailResult()

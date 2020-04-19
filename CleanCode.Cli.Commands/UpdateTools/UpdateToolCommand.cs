@@ -14,6 +14,7 @@ namespace CleanCode.Cli.Commands.UpdateTools
             HelpText = "Force update")]
         public bool Force { get; set; }
 
-        public Result<None> Run() => ResharperCltUpdater.UpdateIfNeed(Force);
+        public Result<None> Run() => new ResharperCltUpdater()
+            .UpdateIfNeed(Force);
     }
 }

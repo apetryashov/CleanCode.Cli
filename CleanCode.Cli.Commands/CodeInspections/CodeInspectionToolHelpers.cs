@@ -6,13 +6,24 @@ namespace CleanCode.Cli.Commands.CodeInspections
 {
     public class CodeInspectionToolHelpers
     {
-        private static string PathToTransformSettings
-            => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\Transform-Xslt.ps1");
+        private readonly IDirectory rootDirectory;
 
-        private static string PathToXsltFile
-            => CleanCodeDirectory.GetWithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt");
+        public CodeInspectionToolHelpers(IDirectory rootDirectory)
+        {
+            this.rootDirectory = rootDirectory;
+        }
+        
+        private string PathToTransformSettings
+            => rootDirectory
+                .WithSubDirectory("Tools\\TransformSettingsReSharperCLT\\Transform-Xslt.ps1")
+                .GetPath();
 
-        public static Result<None> ConvertXmlReportToHtml(string pathToXmlReport, string outFileName)
+        private string PathToXsltFile
+            =>  rootDirectory
+                .WithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt")
+                .GetPath();
+
+        public Result<None> ConvertXmlReportToHtml(string pathToXmlReport, string outFileName)
             => Cmd.RunProcess(
                 "powershell",
                 $"{PathToTransformSettings} {pathToXmlReport} {PathToXsltFile} {outFileName}"
