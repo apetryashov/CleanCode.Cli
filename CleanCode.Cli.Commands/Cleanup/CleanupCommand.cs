@@ -27,17 +27,24 @@ namespace CleanCode.Cli.Commands.Cleanup
 
         private Result<None> StartCleanup(FileInfo sln)
         {
-            var scannedFiles = Force
-                ? FileUtils.GetAllValuableCsFiles(sln.Directory)
-                : FilesHashCacheStorage.GetChangedFiles(sln.Directory);
+            var scanningFiles = GetFiles(sln.Directory);
+            var scanningFilesWithHash = scanningFiles.Select(file => (file, hash: file.CalculateMd5Hash())).ToList();
 
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
-            return new ReSharperCodeStyleValidator(cliDirectory)
-                .Run(sln, scannedFiles)
-                .Then(_ => FilesHashCacheStorage.UpdateFilesHash(scannedFiles))
-                .Then(files => FailIfHasDirtyFiles(sln.Directory, files));
+            return new ReSharperCodeStyleValidator(cliDirectory).Run(sln, scanningFiles)
+                .Then(_ => FilesHashCacheStorage.UpdateFilesHash(scanningFiles))
+                .Then(_ => GetFailedFiles())
+                .Then(failedFiles => FailIfHasDirtyFiles(sln.Directory, failedFiles));
+
+            IEnumerable<FileInfo> GetFailedFiles() => scanningFilesWithHash
+                .Where(x => x.hash != x.file.CalculateMd5Hash())
+                .Select(x => x.file);
         }
+
+        private IReadOnlyCollection<FileInfo> GetFiles(DirectoryInfo directory) => Force
+            ? FileUtils.GetAllValuableCsFiles(directory)
+            : FilesHashCacheStorage.GetNewAndUpdatedFiles(directory);
 
         private static Result<None> FailIfHasDirtyFiles(DirectoryInfo slnDirectory, IEnumerable<FileInfo> dirtyFiles)
         {

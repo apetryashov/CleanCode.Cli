@@ -41,7 +41,7 @@ namespace CleanCode.Helpers
                 .ToList();
         }
 
-        public static string CalculateFileHash(FileInfo fileInfo)
+        public static string CalculateMd5Hash(this FileInfo fileInfo)
         {
             using var md5 = MD5.Create();
             return BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(fileInfo.FullName)));

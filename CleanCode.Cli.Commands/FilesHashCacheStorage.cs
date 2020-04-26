@@ -14,39 +14,35 @@ namespace CleanCode.Cli.Commands
     {
         private const string CacheCollectionName = "Cache";
 
-        public static IReadOnlyCollection<FileInfo> GetChangedFiles(DirectoryInfo directory)
-        {
-            return GetChangedFiles(FileUtils.GetAllValuableCsFiles(directory))
-                .Select(x => new FileInfo(x.FilePath))
-                .ToList();
-        }
-
-        public static IEnumerable<FileInfo> UpdateFilesHash(IEnumerable<FileInfo> files)
-        {
-            var changedFiles = GetChangedFiles(files);
-
-            using var db = LiteDbHelper.DataBase;
-            var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
-            collection.Upsert(changedFiles);
-
-            return changedFiles.Select(x => new FileInfo(x.FilePath));
-        }
-
-        private static IReadOnlyCollection<FileWithHash> GetChangedFiles(IEnumerable<FileInfo> files)
+        public static IReadOnlyCollection<FileInfo> GetNewAndUpdatedFiles(DirectoryInfo directory)
         {
             using var db = LiteDbHelper.DataBase;
             var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
 
-            return files.Select(file => new FileWithHash
+            var files = FileUtils.GetAllValuableCsFiles(directory);
+
+            return files.Where(IsNewOrChangedFile).ToList();
+
+            bool IsNewOrChangedFile(FileInfo fileInfo)
+            {
+                var cacheFile = collection.FindById(fileInfo.FullName);
+
+                return cacheFile == null || cacheFile.Hash != fileInfo.CalculateMd5Hash();
+            }
+        }
+
+        public static void UpdateFilesHash(IEnumerable<FileInfo> files)
+        {
+            using var db = LiteDbHelper.DataBase;
+            var collection = db.GetCollection<FileWithHash>(CacheCollectionName);
+
+            var newOrChangedFiles = files.Select(file => new FileWithHash
             {
                 FilePath = file.FullName,
-                Hash = FileUtils.CalculateFileHash(file)
-            }).Where(x =>
-            {
-                return collection.FindOne(file =>
-                    file.FilePath == x.FilePath &&
-                    file.Hash == x.Hash) == null;
-            }).ToList();
+                Hash = file.CalculateMd5Hash()
+            });
+
+            collection.Upsert(newOrChangedFiles);
         }
 
         public static void ClearCache()
