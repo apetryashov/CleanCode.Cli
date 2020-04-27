@@ -28,10 +28,6 @@ namespace CleanCode.Helpers
                 return;
             uncheckedFiles.Remove(currentFile);
             ConsoleHelper.LazyLog($"{totalFiles - uncheckedFiles.Count}\\{totalFiles}", currentFile);
-            if (uncheckedFiles.Any())
-                return;
-            ConsoleHelper.ClearCurrentConsoleLine();
-            ConsoleHelper.LogInfo("Finish file checking");
         }
     }
 }

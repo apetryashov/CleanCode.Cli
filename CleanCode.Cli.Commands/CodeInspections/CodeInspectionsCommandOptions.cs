@@ -21,6 +21,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
         [Option('i', "interactive",
             Required = false,
+            Default = true,
             HelpText = "Open result in default browser")]
         public bool Interactive { get; set; }
 

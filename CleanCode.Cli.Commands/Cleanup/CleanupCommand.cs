@@ -33,6 +33,11 @@ namespace CleanCode.Cli.Commands.Cleanup
             ConsoleHelper.LogInfo("Start cleanup. Please waiting.");
 
             return new ReSharperCodeStyleValidator(cliDirectory).Run(sln, scanningFiles)
+                .Then(_ =>
+                {
+                    ConsoleHelper.ClearCurrentConsoleLine();
+                    ConsoleHelper.LogInfo("Finish file checking");
+                })
                 .Then(_ => FilesHashCacheStorage.UpdateFilesHash(scanningFiles))
                 .Then(_ => GetFailedFiles())
                 .Then(failedFiles => FailIfHasDirtyFiles(sln.Directory, failedFiles));

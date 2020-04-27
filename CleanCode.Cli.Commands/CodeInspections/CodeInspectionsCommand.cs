@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,11 @@ namespace CleanCode.Cli.Commands.CodeInspections
 
                     return new ReSharperClt(rootDirectory)
                         .RunInspectCodeTool(sln.FullName, tempFile, progressBar.RegisterFile)
+                        .Then(_ =>
+                        {
+                            ConsoleHelper.ClearCurrentConsoleLine();
+                            ConsoleHelper.LogInfo("Finish file checking");
+                        })
                         .Then(_ => CheckXmlReport(tempFile))
                         .Then(_ => ConsoleHelper.LogInfo("All files are clean"))
                         .OnFail(error =>
