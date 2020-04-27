@@ -8,7 +8,6 @@ using LiteDB;
 
 namespace CleanCode.Cli.Commands
 {
-    //TODO: тут можно прибраться скорее всего
     [SuppressMessage("ReSharper", "RedundantAssignment")]
     public static class FilesHashCacheStorage
     {

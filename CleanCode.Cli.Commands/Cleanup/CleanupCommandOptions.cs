@@ -11,7 +11,7 @@ namespace CleanCode.Cli.Commands.Cleanup
         [Option('s', "solution",
             Required = false,
             HelpText = "Custom path to .sln file. Current directory by default ")]
-        public string? PathToSlnFolder { get; set; }
+        public string PathToSlnFolder { get; set; }
 
         [Option('f', "force",
             Required = false,

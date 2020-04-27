@@ -1,4 +1,5 @@
 using CleanCode.Cli.Common;
+using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
 using JetBrains.Annotations;
@@ -9,6 +10,11 @@ namespace CleanCode.Cli.Commands.GenerateDotSettings
     [Verb("gds", HelpText = "Generate .DotSettings file in sln directory")]
     public class GenerateDotSettingsCommand : ICommand
     {
-        public Result<None> Run() => throw new System.NotImplementedException();
+        public Result<None> Run()
+        {
+            ConsoleHelper.LogInfo("Not implemented");
+
+            return Result.Ok();
+        }
     }
 }
