@@ -14,12 +14,13 @@ namespace CleanCode.Cli.Commands.UpdateTools
         private IDirectory ToolDir => rootDirectory.WithSubDirectory("Tools\\resharper-clt");
 
         private const string StateCollectionName = "State";
+        private IVersionProvider versionProvider = new ResharperCltVersionProvider();
 
         public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
 
-        public Result<None> UpdateIfNeed(bool force = false)
+        public Result<None> UpdateIfNeed(bool force = false) //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
         {
-            var meta = ResharperCltHelper.GetInformationAboutLastVersion();
+            var meta = versionProvider.GetLastVersion();
 
             if (!force && !NeedUpdate(meta.Version))
             {
@@ -31,14 +32,14 @@ namespace CleanCode.Cli.Commands.UpdateTools
             return Update(meta);
         }
 
-        public Result<None> Update(ReSharperCltToolMeta meta) => ZipHelper
-            .DownloadAndExtractZipFile(meta.DownloadUrl, ToolDir.GetPath())
-            .Then(_ => UpdateState(meta.Version))
-            .Then(_ =>
-            {
-                FilesHashCacheStorage.ClearCache();
-                ConsoleHelper.LogInfo("The file cache has been cleared :(");
-            });
+        public Result<None> Update(ToolMeta meta) =>
+            versionProvider.DownloadAndExtractToDirectory(meta, ToolDir)
+                .Then(_ => UpdateState(meta.Version))
+                .Then(_ =>
+                {
+                    FilesHashCacheStorage.ClearCache();
+                    ConsoleHelper.LogInfo("The file cache has been cleared :(");
+                });
 
         private static bool NeedUpdate(string currentVersion)
         {
