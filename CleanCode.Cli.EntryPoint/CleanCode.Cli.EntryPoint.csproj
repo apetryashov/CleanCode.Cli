@@ -5,7 +5,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>CleanCode.Tool</RootNamespace>
         <AssemblyName>clean-code</AssemblyName>
-        <PackageVersion>1.0.0-beta</PackageVersion>
+        <PackageVersion>1.1.0-beta</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
