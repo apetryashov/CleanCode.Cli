@@ -18,7 +18,10 @@ namespace CleanCode.Cli.Commands.UpdateTools
 
         public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
 
-        public Result<None> UpdateIfNeed(bool force = false) //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
+        public Result<None>
+            UpdateIfNeed(
+                bool force =
+                    false) //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
         {
             var meta = versionProvider.GetLastVersion();
 
@@ -52,14 +55,14 @@ namespace CleanCode.Cli.Commands.UpdateTools
         {
             using var db = LiteDbHelper.DataBase;
 
-            return db.GetCollection<State>(StateCollectionName).Query().FirstOrDefault();
+            return db.GetCollection<State>(StateCollectionName).FindById("state");
         }
 
         private static void UpdateState(string newVersion)
         {
             using var db = LiteDbHelper.DataBase;
             var collection = db.GetCollection<State>(StateCollectionName);
-            collection.Upsert(new State {Version = newVersion});
+            collection.Upsert("state", new State {Version = newVersion});
 
             ConsoleHelper.LogInfo(
                 $"A new version of resharper-clt was installed. New version - {newVersion}");
