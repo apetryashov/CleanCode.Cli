@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using System.Net;
+using System.Text;
 using CleanCode.Helpers;
 using CleanCode.Results;
 using Newtonsoft.Json.Linq;
@@ -7,7 +9,7 @@ namespace CleanCode.Cli.Common
 {
     public class CleanCodeToolVersionProvider : IVersionProvider
     {
-        private string allReleases = "https://api.github.com/repos/apetryashov/CleanCode.Cli/releases";
+        private readonly string allReleases = "https://api.github.com/repos/apetryashov/CleanCode.Cli/releases";
 
         public ToolMeta GetLastVersion()
         {
@@ -27,6 +29,11 @@ namespace CleanCode.Cli.Common
         }
 
         public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) =>
-            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath());
+            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath())
+                .Then(_ => ZipFile.ExtractToDirectory(
+                    "TransformSettingsReSharperCLT.zip",
+                    outDirectory.WithSubDirectory("Tools\\TransformSettingsReSharperCLT").GetPath(),
+                    Encoding.Default,
+                    true));
     }
 }
