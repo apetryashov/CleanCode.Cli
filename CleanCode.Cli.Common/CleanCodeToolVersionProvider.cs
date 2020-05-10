@@ -1,39 +1,65 @@
 using System.IO.Compression;
-using System.Net;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using CleanCode.Helpers;
 using CleanCode.Results;
-using Newtonsoft.Json.Linq;
+using Octokit;
 
 namespace CleanCode.Cli.Common
 {
     public class CleanCodeToolVersionProvider : IVersionProvider
     {
-        private readonly string allReleases = "https://api.github.com/repos/apetryashov/CleanCode.Cli/releases";
+        private readonly bool downloadPrerelease;
+        private readonly string toolZipName = "clean-code.zip";
 
-        public ToolMeta GetLastVersion()
+        public CleanCodeToolVersionProvider(bool downloadPrerelease = false)
         {
-            using var client = new WebClient();
-            client.Headers.Add("User-Agent", "request");
-            var jsonMeta = client.DownloadString(allReleases);
-            var allReleasesInformation = JArray.Parse(jsonMeta);
-            var laseRelease = allReleasesInformation.First;
-            var lastVersion = laseRelease.SelectToken("tag_name").Value<string>();
-            var downloadUrl = laseRelease.SelectToken("assets[0].browser_download_url").Value<string>();
+            this.downloadPrerelease = downloadPrerelease;
+        }
 
-            return new ToolMeta
+        public Result<ToolMeta> GetLastVersion()
+        {
+            try
             {
-                Version = lastVersion,
-                DownloadUrl = downloadUrl
-            };
+                var release = GetRelease().Result;
+                var releaseVersion = release.Name;
+                var asset = release.Assets.FirstOrDefault(x => x.Name == toolZipName);
+
+                if (asset == null)
+                    return $"Can't find clean-code.zip file in release assets. Release version: {releaseVersion}";
+
+
+                return new ToolMeta
+                {
+                    Version = releaseVersion,
+                    DownloadUrl = asset.BrowserDownloadUrl
+                };
+            }
+            catch
+            {
+                return "Something went wrong. Check your internet connection.";
+            }
+        }
+
+        private async Task<Release> GetRelease()
+        {
+            var client = new GitHubClient(new ProductHeaderValue("clean-code.tool"));
+            if (!downloadPrerelease)
+                return await client.Repository.Release.GetLatest("apetryashov", "CleanCode.Cli");
+
+            var releases = await client.Repository.Release.GetAll("apetryashov", "CleanCode.Cli");
+
+            return releases.First();
         }
 
         public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) =>
             ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath())
                 .Then(_ => ZipFile.ExtractToDirectory(
-                    "TransformSettingsReSharperCLT.zip",
-                    outDirectory.WithSubDirectory("Tools\\TransformSettingsReSharperCLT").GetPath(),
+                    toolZipName,
+                    outDirectory.GetPath(),
                     Encoding.Default,
-                    true));
+                    true))
+                .Then(_ => ConsoleHelper.LogInfo($"New clean-code.tool was installed. New version: {meta.Version}"));
     }
 }

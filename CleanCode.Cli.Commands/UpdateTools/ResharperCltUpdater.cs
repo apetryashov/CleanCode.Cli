@@ -18,22 +18,21 @@ namespace CleanCode.Cli.Commands.UpdateTools
 
         public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
 
-        public Result<None>
-            UpdateIfNeed(
-                bool force =
-                    false) //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
-        {
-            var meta = versionProvider.GetLastVersion();
+        //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
+        public Result<None> UpdateIfNeed(bool force = false)
+            => versionProvider.GetLastVersion()
+                .Then(meta =>
+                {
+                    if (!force && !NeedUpdate(meta.Version))
+                    {
+                        ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
+                        return Result.Ok();
+                    }
 
-            if (!force && !NeedUpdate(meta.Version))
-            {
-                ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
-                return Result.Ok();
-            }
-
-            ConsoleHelper.LogInfo("Please wait. A New version of resharper-clt will be installed in a few seconds");
-            return Update(meta);
-        }
+                    ConsoleHelper.LogInfo(
+                        "Please wait. A New version of 'resharper-clt' will be installed in a few seconds");
+                    return Update(meta);
+                });
 
         public Result<None> Update(ToolMeta meta) =>
             versionProvider.DownloadAndExtractToDirectory(meta, ToolDir)
