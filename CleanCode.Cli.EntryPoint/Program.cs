@@ -1,13 +1,15 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using CleanCode.Cli;
 using CleanCode.Cli.Common;
 using CleanCode.Helpers;
+using CleanCode.Results;
 
 namespace CleanCode.Tool
 {
     internal static class Program
     {
-        private static string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        private static string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 
         //TODO: Затащить это все в chocolatey
         //TODO: Добавить команду generate-dot-settings
@@ -15,6 +17,7 @@ namespace CleanCode.Tool
         //TODO: Добавить тесты
         //TODO: Перевести на DI (будет полезно для тестов)
         //TODO: Добавить автообновление утилиты
+        //TODO: Избавиться от всех try catch
         private static void Main(string[] args)
         {
             UpdateIfNeed();
@@ -23,14 +26,14 @@ namespace CleanCode.Tool
 
         private static void UpdateIfNeed()
         {
-            var versionProvider = new CleanCodeToolVersionProvider();
-            var meta = versionProvider.GetLastVersion();
+            var versionProvider = new CleanCodeToolVersionProvider(false);
 
-            if (meta.Version.Equals(CurrentVersion))
-                return;
-            versionProvider.DownloadAndExtractToDirectory(meta, new CleanCodeDirectory());
-
-            ConsoleHelper.LogInfo($"New cli version will be installed. New version {meta.Version}");
+            versionProvider
+                .GetLastVersion()
+                .Then(meta => meta.Version.Equals(CurrentVersion)
+                    ? Result.Ok()
+                    : versionProvider.DownloadAndExtractToDirectory(meta, new CleanCodeDirectory()))
+                .OnFail(ConsoleHelper.LogError);
         }
     }
 }

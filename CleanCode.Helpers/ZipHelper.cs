@@ -11,15 +11,22 @@ namespace CleanCode.Helpers
     {
         public static Result<None> DownloadAndExtractZipFile(string downloadUrl, string targetDirectory)
         {
-            using var tempDir = new TempDirectory();
-            using var client = new WebClient();
+            try
+            {
+                using var tempDir = new TempDirectory();
+                using var client = new WebClient();
 
-            var tempFileName = $"{Guid.NewGuid()}.zip";
-            var fileName = Path.Combine(tempDir.PathToTempDirectory, tempFileName);
-            client.DownloadFile(downloadUrl, fileName);
-            ZipFile.ExtractToDirectory(fileName, targetDirectory, Encoding.Default, true);
+                var tempFileName = $"{Guid.NewGuid()}.zip";
+                var fileName = Path.Combine(tempDir.PathToTempDirectory, tempFileName);
+                client.DownloadFile(downloadUrl, fileName);
+                ZipFile.ExtractToDirectory(fileName, targetDirectory, Encoding.Default, true);
 
-            return Result.Ok();
+                return Result.Ok();
+            }
+            catch
+            {
+                return "Something went wrong. Check your internet connection.";
+            }
         }
     }
 }
