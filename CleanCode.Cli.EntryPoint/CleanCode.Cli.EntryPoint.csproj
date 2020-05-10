@@ -15,9 +15,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
-      <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
-      <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
+        <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
+        <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
+        <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <None Update="TransformSettingsReSharperCLT.zip">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+
 
 </Project>

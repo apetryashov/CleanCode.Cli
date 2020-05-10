@@ -9,10 +9,4 @@
       <ProjectReference Include="..\CleanCode.Cli.Common\CleanCode.Cli.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="TransformSettingsReSharperCLT.zip">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
