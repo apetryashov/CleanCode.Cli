@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using System.Reflection;
 using CleanCode.Cli;
 using CleanCode.Cli.Common;
@@ -54,7 +55,7 @@ namespace CleanCode.Tool
             if (!File.Exists(developerFile))
                 return false;
 
-            var developerFlags = JsonConvert.DeserializeObject<DeveloperFlags>(developerFile);
+            var developerFlags = JsonConvert.DeserializeObject<DeveloperFlags>(File.ReadAllText(developerFile));
 
             if (developerFlags.DeveloperMode)
                 ConsoleHelper.LogInfo("developer mode enabled");
