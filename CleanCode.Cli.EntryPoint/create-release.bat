@@ -1,6 +1,6 @@
 @echo off
 
-dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
+dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
 
 del .\bin\Release\netcoreapp3.1\win-x64\publish\clean-code.pdb
 
