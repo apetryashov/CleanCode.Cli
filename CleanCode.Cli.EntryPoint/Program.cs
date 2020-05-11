@@ -1,15 +1,18 @@
-﻿using System;
+﻿using System.IO;
 using System.Reflection;
 using CleanCode.Cli;
 using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
+using Newtonsoft.Json;
 
 namespace CleanCode.Tool
 {
     internal static class Program
     {
         private static string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+        private static IDirectory cliDirectory = new CleanCodeDirectory();
+        private static string DeveloperFlagsFile = "developer_flags.json";
 
         //TODO: Затащить это все в chocolatey
         //TODO: Добавить команду generate-dot-settings
@@ -18,22 +21,45 @@ namespace CleanCode.Tool
         //TODO: Перевести на DI (будет полезно для тестов)
         //TODO: Добавить автообновление утилиты
         //TODO: Избавиться от всех try catch
+        //TODO: Научить работать с ключем /p:PublishTrimmed=true
         private static void Main(string[] args)
         {
-            UpdateIfNeed();
+            if (NewVersionWasInstalled())
+                return;
+
             new CommandProvider().StartCommand(args);
         }
 
-        private static void UpdateIfNeed()
+        private static bool NewVersionWasInstalled()
         {
-            var versionProvider = new CleanCodeToolVersionProvider(false);
+            var versionProvider = new CleanCodeToolVersionProvider(IsDeveloperMode());
 
-            versionProvider
-                .GetLastVersion()
-                .Then(meta => meta.Version.Equals(CurrentVersion)
-                    ? Result.Ok()
-                    : versionProvider.DownloadAndExtractToDirectory(meta, new CleanCodeDirectory()))
-                .OnFail(ConsoleHelper.LogError);
+            return versionProvider.GetLastVersion()
+                .Then(meta =>
+                {
+                    if (meta.Version.Equals(CurrentVersion))
+                        return false;
+
+                    return versionProvider.DownloadAndExtractToDirectory(meta, cliDirectory.WithSubDirectory("new"))
+                        .Then(_ => true);
+                })
+                .OnFail(ConsoleHelper.LogError)
+                .GetValueOrThrow();
+        }
+
+        private static bool IsDeveloperMode()
+        {
+            var developerFile = cliDirectory.WithSubDirectory(DeveloperFlagsFile).GetPath();
+
+            if (!File.Exists(developerFile))
+                return false;
+
+            var developerFlags = JsonConvert.DeserializeObject<DeveloperFlags>(developerFile);
+
+            if (developerFlags.DeveloperMode)
+                ConsoleHelper.LogInfo("developer mode enabled");
+
+            return developerFlags.DeveloperMode;
         }
     }
 }

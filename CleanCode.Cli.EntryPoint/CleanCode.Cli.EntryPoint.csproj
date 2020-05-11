@@ -5,12 +5,11 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>CleanCode.Tool</RootNamespace>
         <AssemblyName>clean-code</AssemblyName>
-        <PackageVersion>1.1.0-beta</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <Company>@apetryashov</Company>
-        <Version>0.0.1-beta</Version>
+        <Version>1.1.0.1</Version>
         <AssemblyTitle>clean-code</AssemblyTitle>
     </PropertyGroup>
 
@@ -21,10 +20,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="TransformSettingsReSharperCLT.zip">
+        <None Update="TransformSettingsReSharperCLT\dup.xslt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
+        <None Update="TransformSettingsReSharperCLT\ic.xslt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+        <None Update="TransformSettingsReSharperCLT\Transform-Xslt.ps1">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
 

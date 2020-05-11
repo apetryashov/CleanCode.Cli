@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CleanCode.Cli.Common;
 using CleanCode.Helpers;
 using CleanCode.Results;
@@ -14,11 +15,10 @@ namespace CleanCode.Installer
             var versionProvider = new CleanCodeToolVersionProvider();
 
             versionProvider.GetLastVersion()
-                .Then(meta => versionProvider.DownloadAndExtractToDirectory(meta, CliDirectory)
-                    .Then(_ => SetToPathIfNeed())
-                    .Then(_ => ConsoleHelper.LogInfo(
-                        $"'clean-code' has been successfully installed. Current Version - {meta.Version}"))
-                )
+                .Then(
+                    meta => versionProvider.DownloadAndExtractToDirectory(meta, CliDirectory.WithSubDirectory("tool")))
+                .Then(_ => CreateRunFile())
+                .Then(_ => SetToPathIfNeed())
                 .OnFail(ConsoleHelper.LogError);
         }
 
@@ -32,6 +32,24 @@ namespace CleanCode.Installer
                 return;
             var newValue = oldValue + $";{cliDirectory}";
             Environment.SetEnvironmentVariable(name, newValue, scope);
+        }
+
+        private static void CreateRunFile()
+        {
+            const string runCmdCommand = @"
+@echo off
+SET exit_code=%errorlevel%
+
+""%~dp0\tool\clean-code.exe"" %*
+if exist %~dp0\new (
+	rmdir %~dp0\tool /S /Q > nul
+	ren %~dp0\new tool > nul
+    ""%~dp0\tool\clean-code.exe"" %*
+)
+
+cmd /C exit %exit_code% > nul
+";
+            File.WriteAllText(CliDirectory.WithSubDirectory("clean-code.cmd").GetPath(), runCmdCommand);
         }
     }
 }

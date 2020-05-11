@@ -1,6 +1,5 @@
-using System.IO.Compression;
+using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CleanCode.Helpers;
 using CleanCode.Results;
@@ -23,12 +22,11 @@ namespace CleanCode.Cli.Common
             try
             {
                 var release = GetRelease().Result;
-                var releaseVersion = release.Name;
+                var releaseVersion = release.TagName;
                 var asset = release.Assets.FirstOrDefault(x => x.Name == toolZipName);
 
                 if (asset == null)
                     return $"Can't find clean-code.zip file in release assets. Release version: {releaseVersion}";
-
 
                 return new ToolMeta
                 {
@@ -54,12 +52,7 @@ namespace CleanCode.Cli.Common
         }
 
         public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) =>
-            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath())
-                .Then(_ => ZipFile.ExtractToDirectory(
-                    toolZipName,
-                    outDirectory.GetPath(),
-                    Encoding.Default,
-                    true))
+            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, $"{outDirectory.GetPath()}")
                 .Then(_ => ConsoleHelper.LogInfo($"New clean-code.tool was installed. New version: {meta.Version}"));
     }
 }
