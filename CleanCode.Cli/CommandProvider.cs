@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using CleanCode.Cli.Commands.Cleanup;
 using CleanCode.Cli.Commands.CodeInspections;
 using CleanCode.Cli.Commands.GenerateDotSettings;
@@ -15,6 +16,7 @@ namespace CleanCode.Cli
 {
     public class CommandProvider
     {
+        private static string CurrentVersion => Assembly.GetEntryAssembly()!.GetName().Version!.ToString();
         private static readonly string[] DefaultArgs = {"--help"};
 
         private readonly Type[] commands =
@@ -51,7 +53,7 @@ namespace CleanCode.Cli
                         AutoVersion = false
                     }
                     .AddPreOptionsLine("Info:")
-                    .AddPostOptionsLine($"{CopyrightInfo.Default}"),
+                    .AddPostOptionsLine($"{CopyrightInfo.Default} v{CurrentVersion}"),
                 e => e,
                 true);
 

@@ -16,7 +16,7 @@ namespace CleanCode.Installer
 
             versionProvider.GetLastVersion()
                 .Then(
-                    meta => versionProvider.DownloadAndExtractToDirectory(meta, CliDirectory.WithSubDirectory("tool")))
+                    meta => versionProvider.DownloadAndExtractToDirectory(meta, CliDirectory.WithSubDirectory("Tool")))
                 .Then(_ => CreateRunFile())
                 .Then(_ => SetToPathIfNeed())
                 .OnFail(ConsoleHelper.LogError);
@@ -40,11 +40,11 @@ namespace CleanCode.Installer
 @echo off
 SET exit_code=%errorlevel%
 
-""%~dp0\tool\clean-code.exe"" %*
-if exist %~dp0\new (
-	rmdir %~dp0\tool /S /Q > nul
-	ren %~dp0\new tool > nul
-    ""%~dp0\tool\clean-code.exe"" %*
+""%~dp0\Tool\clean-code.exe"" %*
+if exist %~dp0\new-tool (
+	rmdir %~dp0\Tool /S /Q > nul
+	ren %~dp0\new-tool Tool > nul
+    ""%~dp0\Tool\clean-code.exe"" %*
 )
 
 cmd /C exit %exit_code% > nul

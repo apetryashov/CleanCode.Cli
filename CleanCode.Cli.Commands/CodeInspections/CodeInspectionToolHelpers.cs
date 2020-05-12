@@ -8,19 +8,22 @@ namespace CleanCode.Cli.Commands.CodeInspections
     {
         private readonly IDirectory rootDirectory;
 
+        private IDirectory transformSettingsReSharperCLT => rootDirectory
+            .WithSubDirectory("Tool\\TransformSettingsReSharperCLT");
+
         public CodeInspectionToolHelpers(IDirectory rootDirectory)
         {
             this.rootDirectory = rootDirectory;
         }
-        
+
         private string PathToTransformSettings
-            => rootDirectory
-                .WithSubDirectory("Tools\\TransformSettingsReSharperCLT\\Transform-Xslt.ps1")
+            => transformSettingsReSharperCLT
+                .WithSubDirectory("Transform-Xslt.ps1")
                 .GetPath();
 
         private string PathToXsltFile
-            =>  rootDirectory
-                .WithSubDirectory("Tools\\TransformSettingsReSharperCLT\\ic.xslt")
+            => transformSettingsReSharperCLT
+                .WithSubDirectory("ic.xslt")
                 .GetPath();
 
         public Result<None> ConvertXmlReportToHtml(string pathToXmlReport, string outFileName)

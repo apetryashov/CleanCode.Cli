@@ -11,7 +11,7 @@ namespace CleanCode.Cli.Commands.UpdateTools
     public class ResharperCltUpdater
     {
         private readonly IDirectory rootDirectory;
-        private IDirectory ToolDir => rootDirectory.WithSubDirectory("Tools\\resharper-clt");
+        private IDirectory ToolDir => rootDirectory.WithSubDirectory("Utils\\resharper-clt");
 
         private const string StateCollectionName = "State";
         private IVersionProvider versionProvider = new ResharperCltVersionProvider();

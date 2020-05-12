@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Net;
 using System.Reflection;
 using CleanCode.Cli;
 using CleanCode.Cli.Common;
@@ -41,7 +40,8 @@ namespace CleanCode.Tool
                     if (meta.Version.Equals(CurrentVersion))
                         return false;
 
-                    return versionProvider.DownloadAndExtractToDirectory(meta, cliDirectory.WithSubDirectory("new"))
+                    return versionProvider
+                        .DownloadAndExtractToDirectory(meta, cliDirectory.WithSubDirectory("new-tool"))
                         .Then(_ => true);
                 })
                 .OnFail(ConsoleHelper.LogError)
