@@ -9,20 +9,34 @@
 
     <PropertyGroup>
         <Company>@apetryashov</Company>
-        <Version>0.0.1-beta</Version>
+        <Version>1.1.0.3</Version>
         <AssemblyTitle>clean-code</AssemblyTitle>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
-      <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
-      <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
+        <ProjectReference Include="..\CleanCode.Cli.Commands\CleanCode.Cli.Commands.csproj" />
+        <ProjectReference Include="..\CleanCode.Cli\CleanCode.Cli.csproj" />
+        <ProjectReference Include="..\CleanCode.Helpers\CleanCode.Helpers.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TransformSettingsReSharperCLT.zip">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="TransformSettingsReSharperCLT\dup.xslt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+        <None Update="TransformSettingsReSharperCLT\ic.xslt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+        <None Update="TransformSettingsReSharperCLT\Transform-Xslt.ps1">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+
 
 </Project>

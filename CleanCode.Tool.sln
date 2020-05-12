@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanCode.Cli", "CleanCode.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanCode.Cli.Common", "CleanCode.Cli.Common\CleanCode.Cli.Common.csproj", "{62D1B20E-ED6F-40F5-99CD-29DB16FA8AB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanCode.Installer", "CleanCode.Installer\CleanCode.Installer.csproj", "{16F99D53-B833-43B2-ABE1-A82905AAD38A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{62D1B20E-ED6F-40F5-99CD-29DB16FA8AB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62D1B20E-ED6F-40F5-99CD-29DB16FA8AB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62D1B20E-ED6F-40F5-99CD-29DB16FA8AB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16F99D53-B833-43B2-ABE1-A82905AAD38A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16F99D53-B833-43B2-ABE1-A82905AAD38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16F99D53-B833-43B2-ABE1-A82905AAD38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16F99D53-B833-43B2-ABE1-A82905AAD38A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

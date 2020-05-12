@@ -11,34 +11,37 @@ namespace CleanCode.Cli.Commands.UpdateTools
     public class ResharperCltUpdater
     {
         private readonly IDirectory rootDirectory;
-        private IDirectory ToolDir => rootDirectory.WithSubDirectory("Tools\\resharper-clt");
+        private IDirectory ToolDir => rootDirectory.WithSubDirectory("Utils\\resharper-clt");
 
         private const string StateCollectionName = "State";
+        private IVersionProvider versionProvider = new ResharperCltVersionProvider();
 
         public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
 
+        //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
         public Result<None> UpdateIfNeed(bool force = false)
-        {
-            var meta = ResharperCltHelper.GetInformationAboutLastVersion();
+            => versionProvider.GetLastVersion()
+                .Then(meta =>
+                {
+                    if (!force && !NeedUpdate(meta.Version))
+                    {
+                        ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
+                        return Result.Ok();
+                    }
 
-            if (!force && !NeedUpdate(meta.Version))
-            {
-                ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
-                return Result.Ok();
-            }
+                    ConsoleHelper.LogInfo(
+                        "Please wait. A New version of 'resharper-clt' will be installed in a few seconds");
+                    return Update(meta);
+                });
 
-            ConsoleHelper.LogInfo("Please wait. A New version of resharper-clt will be installed in a few seconds");
-            return Update(meta);
-        }
-
-        public Result<None> Update(ReSharperCltToolMeta meta) => ZipHelper
-            .DownloadAndExtractZipFile(meta.DownloadUrl, ToolDir.GetPath())
-            .Then(_ => UpdateState(meta.Version))
-            .Then(_ =>
-            {
-                FilesHashCacheStorage.ClearCache();
-                ConsoleHelper.LogInfo("The file cache has been cleared :(");
-            });
+        public Result<None> Update(ToolMeta meta) =>
+            versionProvider.DownloadAndExtractToDirectory(meta, ToolDir)
+                .Then(_ => UpdateState(meta.Version))
+                .Then(_ =>
+                {
+                    FilesHashCacheStorage.ClearCache();
+                    ConsoleHelper.LogInfo("The file cache has been cleared :(");
+                });
 
         private static bool NeedUpdate(string currentVersion)
         {
@@ -51,14 +54,14 @@ namespace CleanCode.Cli.Commands.UpdateTools
         {
             using var db = LiteDbHelper.DataBase;
 
-            return db.GetCollection<State>(StateCollectionName).Query().FirstOrDefault();
+            return db.GetCollection<State>(StateCollectionName).FindById("state");
         }
 
         private static void UpdateState(string newVersion)
         {
             using var db = LiteDbHelper.DataBase;
             var collection = db.GetCollection<State>(StateCollectionName);
-            collection.Upsert(new State {Version = newVersion});
+            collection.Upsert("state", new State {Version = newVersion});
 
             ConsoleHelper.LogInfo(
                 $"A new version of resharper-clt was installed. New version - {newVersion}");
