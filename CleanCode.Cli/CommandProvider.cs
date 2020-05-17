@@ -27,7 +27,7 @@ namespace CleanCode.Cli
             typeof(UpdateToolCommand),
         };
 
-        public void StartCommand(string[] args)
+        public Result<None> StartCommand(string[] args)
         {
             args = args.Any() ? args : DefaultArgs;
 
@@ -38,12 +38,13 @@ namespace CleanCode.Cli
                 })
                 .ParseArguments(args, commands);
 
-            parserResult
-                .WithParsed<ICommand>(ExecuteCommand)
-                .WithNotParsed(errs => DisplayHelp(parserResult, errs));
+            return parserResult
+                .MapResult<ICommand, Result<None>>(
+                    command => command.Run(),
+                    errs => DisplayHelp(parserResult, errs));
         }
 
-        private static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> _)
+        private static Result<None> DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> _)
         {
             var helpText = HelpText.AutoBuild(result, h => new HelpText
                     {
@@ -58,10 +59,7 @@ namespace CleanCode.Cli
                 true);
 
             Console.WriteLine(helpText.ToString().Trim());
+            return Result.Ok();
         }
-
-        private static void ExecuteCommand(ICommand command) => command
-            .Run()
-            .OnFail(ConsoleHelper.LogError);
     }
 }

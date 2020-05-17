@@ -22,12 +22,15 @@ namespace CleanCode.Tool
         //TODO: Добавить автообновление утилиты
         //TODO: Избавиться от всех try catch
         //TODO: Научить работать с ключем /p:PublishTrimmed=true
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             if (NewVersionWasInstalled())
-                return;
+                return 0;
 
-            new CommandProvider().StartCommand(args);
+            var result = new CommandProvider().StartCommand(args)
+                .OnFail(ConsoleHelper.LogError);
+
+            return result.IsSuccess ? 0 : 1;
         }
 
         private static bool NewVersionWasInstalled()
