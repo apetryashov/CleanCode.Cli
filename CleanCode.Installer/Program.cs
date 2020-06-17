@@ -38,9 +38,9 @@ namespace CleanCode.Installer
         {
             const string runCmdCommand = @"
 @echo off
-SET exit_code=%errorlevel%
 
 ""%~dp0\Tool\clean-code.exe"" %*
+SET exit_code=%errorlevel%
 if exist %~dp0\new-tool (
 	rmdir %~dp0\Tool /S /Q > nul
 	ren %~dp0\new-tool Tool > nul

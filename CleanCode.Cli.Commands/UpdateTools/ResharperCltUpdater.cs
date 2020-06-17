@@ -50,6 +50,7 @@ namespace CleanCode.Cli.Commands.UpdateTools
             return lastInstalledVersion == null || lastInstalledVersion.Version != currentVersion;
         }
 
+        //TODO: надо это унести
         private static State GerLastInstalledVersion()
         {
             using var db = LiteDbHelper.DataBase;
