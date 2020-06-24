@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <Company>@apetryashov</Company>
-        <Version>1.1</Version>
+        <Version>1.2</Version>
         <AssemblyTitle>clean-code</AssemblyTitle>
     </PropertyGroup>
 
