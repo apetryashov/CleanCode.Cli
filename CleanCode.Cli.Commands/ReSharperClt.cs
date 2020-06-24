@@ -10,6 +10,8 @@ namespace CleanCode.Cli.Commands
     {
         private readonly IDirectory rootDirectory;
 
+        public ReSharperClt(IDirectory rootDirectory) => this.rootDirectory = rootDirectory;
+
         private IDirectory UtilDirectory
             => rootDirectory.WithSubDirectory("Utils").WithSubDirectory("resharper-clt");
 
@@ -18,8 +20,6 @@ namespace CleanCode.Cli.Commands
 
         private IDirectory ReSharperCleanupCodeCli
             => UtilDirectory.WithSubDirectory("cleanupcode.exe");
-        
-        public ReSharperClt(IDirectory rootDirectory) => this.rootDirectory = rootDirectory;
 
         public Result<None> RunInspectCodeTool(string pathToSlnFile, string outFile, Action<string> callBack)
             => Cmd.RunProcess(
@@ -27,11 +27,13 @@ namespace CleanCode.Cli.Commands
                 $"{pathToSlnFile} --o={outFile}",
                 callBack);
 
-        public Result<None> RunCleanupTool(string pathToSlnFile, IEnumerable<string> relativeFilePaths,
+        public Result<None> RunCleanupTool(string pathToSlnFile,
+            IEnumerable<string> relativeFilePaths,
+            string pathToDotSettingsFile,
             Action<string> callBack)
             => Cmd.RunProcess(
                 ReSharperCleanupCodeCli.GetPath(),
-                $"{pathToSlnFile} --include=\"{string.Join(';', relativeFilePaths)}\"",
+                $"{pathToSlnFile} --include=\"{string.Join(';', relativeFilePaths)}\" /settings=\"{pathToDotSettingsFile}\"",
                 callBack
             );
     }
