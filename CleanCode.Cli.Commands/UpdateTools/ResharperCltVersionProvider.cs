@@ -36,7 +36,7 @@ namespace CleanCode.Cli.Commands.UpdateTools
             }
         }
 
-        public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) =>
-            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath());
+        public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory)
+            => ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, outDirectory.GetPath());
     }
 }

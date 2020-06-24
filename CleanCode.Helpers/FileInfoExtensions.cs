@@ -4,7 +4,7 @@ namespace CleanCode.Helpers
 {
     public static class FileInfoExtensions
     {
-        public static string GetRelativePath(this FileInfo fileInfo, DirectoryInfo directoryInfo) =>
-            Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
+        public static string GetRelativePath(this FileInfo fileInfo, DirectoryInfo directoryInfo)
+            => Path.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
     }
 }

@@ -13,10 +13,7 @@ namespace CleanCode.Helpers
             Directory.CreateDirectory(PathToTempDirectory);
         }
 
-        public void Dispose()
-        {
-            DeleteDirectory(PathToTempDirectory);
-        }
+        public void Dispose() => DeleteDirectory(PathToTempDirectory);
 
         private static void DeleteDirectory(string targetDir)
         {
@@ -34,10 +31,7 @@ namespace CleanCode.Helpers
                 File.Delete(file);
             }
 
-            foreach (var dir in dirs)
-            {
-                DeleteDirectory(dir);
-            }
+            foreach (var dir in dirs) DeleteDirectory(dir);
 
             Directory.Delete(targetDir, false);
         }

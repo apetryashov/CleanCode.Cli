@@ -12,10 +12,7 @@ namespace CleanCode.Helpers
             Console.ForegroundColor = currentColor;
         }
 
-        public static void LogInfo(string infoMessage)
-        {
-            Console.WriteLine($"[INFO] {infoMessage}");
-        }
+        public static void LogInfo(string infoMessage) => Console.WriteLine($"[INFO] {infoMessage}");
 
         public static void LazyLog(string tag, string message)
         {
@@ -31,7 +28,7 @@ namespace CleanCode.Helpers
         {
             var currentLineCursor = Console.CursorTop;
             Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth)); 
+            Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, currentLineCursor);
         }
     }

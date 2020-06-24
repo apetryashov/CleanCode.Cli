@@ -26,13 +26,13 @@ namespace CleanCode.Cli.Commands.CodeInspections
         public bool Interactive { get; set; }
 
         [Usage(ApplicationAlias = "clean-code")]
-        public static IEnumerable<Example> Examples => new List<Example>()
+        public static IEnumerable<Example> Examples => new List<Example>
         {
             new Example("Start code-inspection in current directory", new CodeInspectionsCommandOptions()),
             new Example("Start code-inspection in given directory",
                 new CodeInspectionsCommandOptions {PathToSlnFolder = "<path to .sln file>"}),
             new Example("Start code-inspection with custom output file name",
-                new CodeInspectionsCommandOptions {OutFileName = "out.html"}),
+                new CodeInspectionsCommandOptions {OutFileName = "out.html"})
         };
     }
 }

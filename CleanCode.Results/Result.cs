@@ -4,21 +4,15 @@ namespace CleanCode.Results
 {
     public struct Result<T>
     {
-        public Result(string error, T value = default(T))
+        public Result(string error, T value = default)
         {
             Error = error;
             Value = value;
         }
 
-        public static implicit operator Result<T>(T v)
-        {
-            return Result.Ok(v);
-        }
+        public static implicit operator Result<T>(T v) => Result.Ok(v);
 
-        public static implicit operator Result<T>(string error)
-        {
-            return Result.Fail<T>(error);
-        }
+        public static implicit operator Result<T>(string error) => Result.Fail<T>(error);
 
         public string Error { get; }
         internal T Value { get; }
@@ -34,25 +28,13 @@ namespace CleanCode.Results
 
     public static class Result
     {
-        public static Result<T> AsResult<T>(this T value)
-        {
-            return Ok(value);
-        }
+        public static Result<T> AsResult<T>(this T value) => Ok(value);
 
-        public static Result<T> Ok<T>(T value)
-        {
-            return new Result<T>(null, value);
-        }
+        public static Result<T> Ok<T>(T value) => new Result<T>(null, value);
 
-        public static Result<None> Ok()
-        {
-            return Ok<None>(null);
-        }
+        public static Result<None> Ok() => Ok<None>(null);
 
-        public static Result<T> Fail<T>(string e)
-        {
-            return new Result<T>(e);
-        }
+        public static Result<T> Fail<T>(string e) => new Result<T>(e);
 
         public static Result<T> Of<T>(Func<T> f, string error = null)
         {
@@ -82,25 +64,19 @@ namespace CleanCode.Results
         public static Result<TOutput> Then<TInput, TOutput>(
             this Result<TInput> input,
             Func<TInput, TOutput> continuation)
-        {
-            return input.Then(inp => Of(() => continuation(inp)));
-        }
+            => input.Then(inp => Of(() => continuation(inp)));
 
         public static Result<None> Then<TInput>(
             this Result<TInput> input,
             Action<TInput> continuation)
-        {
-            return input.Then(inp => OfAction(() => continuation(inp)));
-        }
+            => input.Then(inp => OfAction(() => continuation(inp)));
 
         public static Result<TOutput> Then<TInput, TOutput>(
             this Result<TInput> input,
             Func<TInput, Result<TOutput>> continuation)
-        {
-            return input.IsSuccess
+            => input.IsSuccess
                 ? continuation(input.Value)
                 : input.Error;
-        }
 
         public static Result<TInput> OnFail<TInput>(
             this Result<TInput> input,
@@ -121,8 +97,6 @@ namespace CleanCode.Results
         public static Result<TInput> RefineError<TInput>(
             this Result<TInput> input,
             string errorMessage)
-        {
-            return input.ReplaceError(err => errorMessage + ". " + err);
-        }
+            => input.ReplaceError(err => errorMessage + ". " + err);
     }
 }

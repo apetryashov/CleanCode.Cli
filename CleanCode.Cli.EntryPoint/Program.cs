@@ -10,9 +10,9 @@ namespace CleanCode.Tool
 {
     internal static class Program
     {
-        private static string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version!.ToString();
         private static readonly IDirectory CliDirectory = new CleanCodeDirectory();
-        private static string DeveloperFlagsFile = "developer_flags.json";
+        private static readonly string DeveloperFlagsFile = "developer_flags.json";
+        private static string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 
         //TODO: Затащить это все в chocolatey
         //TODO: Добавить команду generate-dot-settings

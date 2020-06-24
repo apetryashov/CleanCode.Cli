@@ -53,9 +53,9 @@ namespace CleanCode.Cli.Commands
         [PublicAPI]
         private class FileWithHash
         {
-#nullable disable //because initialized from db
             [BsonId] public string FilePath { get; set; }
             public string Hash { get; set; }
+#nullable disable //because initialized from db
         }
     }
 }

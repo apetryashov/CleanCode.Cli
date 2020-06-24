@@ -7,7 +7,6 @@ using CleanCode.Cli.Commands.CodeInspections;
 using CleanCode.Cli.Commands.GenerateDotSettings;
 using CleanCode.Cli.Commands.UpdateTools;
 using CleanCode.Cli.Common;
-using CleanCode.Helpers;
 using CleanCode.Results;
 using CommandLine;
 using CommandLine.Text;
@@ -16,7 +15,6 @@ namespace CleanCode.Cli
 {
     public class CommandProvider
     {
-        private static string CurrentVersion => Assembly.GetEntryAssembly()!.GetName().Version!.ToString();
         private static readonly string[] DefaultArgs = {"--help"};
 
         private readonly Type[] commands =
@@ -24,8 +22,10 @@ namespace CleanCode.Cli
             typeof(CleanupCommand),
             typeof(CodeInspectionsCommand),
             typeof(GenerateDotSettingsCommand),
-            typeof(UpdateToolCommand),
+            typeof(UpdateToolCommand)
         };
+
+        private static string CurrentVersion => Assembly.GetEntryAssembly()!.GetName().Version!.ToString();
 
         public Result<None> StartCommand(string[] args)
         {

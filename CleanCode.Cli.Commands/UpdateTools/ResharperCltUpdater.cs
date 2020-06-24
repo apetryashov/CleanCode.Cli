@@ -19,29 +19,27 @@ namespace CleanCode.Cli.Commands.UpdateTools
         public ResharperCltUpdater() => rootDirectory = new CleanCodeDirectory();
 
         //TODO: плохо это, что метод IfNeed, но мы все равно можем это обойти с помощью ключа
-        public Result<None> UpdateIfNeed(bool force = false)
-            => versionProvider.GetLastVersion()
-                .Then(meta =>
+        public Result<None> UpdateIfNeed(bool force = false) => versionProvider.GetLastVersion()
+            .Then(meta =>
+            {
+                if (!force && !NeedUpdate(meta.Version))
                 {
-                    if (!force && !NeedUpdate(meta.Version))
-                    {
-                        ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
-                        return Result.Ok();
-                    }
+                    ConsoleHelper.LogInfo($"You have the last version of resharper-clt. Version - {meta.Version}");
+                    return Result.Ok();
+                }
 
-                    ConsoleHelper.LogInfo(
-                        "Please wait. A New version of 'resharper-clt' will be installed in a few seconds");
-                    return Update(meta);
-                });
+                ConsoleHelper.LogInfo(
+                    "Please wait. A New version of 'resharper-clt' will be installed in a few seconds");
+                return Update(meta);
+            });
 
-        public Result<None> Update(ToolMeta meta) =>
-            versionProvider.DownloadAndExtractToDirectory(meta, ToolDir)
-                .Then(_ => UpdateState(meta.Version))
-                .Then(_ =>
-                {
-                    FilesHashCacheStorage.ClearCache();
-                    ConsoleHelper.LogInfo("The file cache has been cleared :(");
-                });
+        public Result<None> Update(ToolMeta meta) => versionProvider.DownloadAndExtractToDirectory(meta, ToolDir)
+            .Then(_ => UpdateState(meta.Version))
+            .Then(_ =>
+            {
+                FilesHashCacheStorage.ClearCache();
+                ConsoleHelper.LogInfo("The file cache has been cleared :(");
+            });
 
         private static bool NeedUpdate(string currentVersion)
         {
@@ -70,8 +68,8 @@ namespace CleanCode.Cli.Commands.UpdateTools
 
         private class State
         {
-#nullable disable //because initialized from db
             public string Version { get; set; }
+#nullable disable //because initialized from db
         }
     }
 }

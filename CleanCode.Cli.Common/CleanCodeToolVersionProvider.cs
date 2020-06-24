@@ -12,9 +12,7 @@ namespace CleanCode.Cli.Common
         private readonly string toolZipName = "clean-code.zip";
 
         public CleanCodeToolVersionProvider(bool downloadPrerelease = false)
-        {
-            this.downloadPrerelease = downloadPrerelease;
-        }
+            => this.downloadPrerelease = downloadPrerelease;
 
         public Result<ToolMeta> GetLastVersion()
         {
@@ -39,6 +37,10 @@ namespace CleanCode.Cli.Common
             }
         }
 
+        public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) => ZipHelper
+            .DownloadAndExtractZipFile(meta.DownloadUrl, $"{outDirectory.GetPath()}")
+            .Then(_ => ConsoleHelper.LogInfo($"New clean-code.tool was installed. New version: {meta.Version}"));
+
         private async Task<Release> GetRelease()
         {
             var client = new GitHubClient(new ProductHeaderValue("clean-code.tool"));
@@ -49,9 +51,5 @@ namespace CleanCode.Cli.Common
 
             return releases.First();
         }
-
-        public Result<None> DownloadAndExtractToDirectory(ToolMeta meta, IDirectory outDirectory) =>
-            ZipHelper.DownloadAndExtractZipFile(meta.DownloadUrl, $"{outDirectory.GetPath()}")
-                .Then(_ => ConsoleHelper.LogInfo($"New clean-code.tool was installed. New version: {meta.Version}"));
     }
 }

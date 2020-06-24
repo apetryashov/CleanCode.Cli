@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace CleanCode.Cli.Commands.CodeInspections
     public class CodeInspectionsCommand : CodeInspectionsCommandOptions, ICommand
     {
         private readonly IDirectory rootDirectory = new CleanCodeDirectory();
-        
+
         public Result<None> Run()
         {
             var files = FileUtils.GetAllValuableCsFiles(new DirectoryInfo(PathToSlnFolder)).ToList();

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,8 +8,8 @@ namespace CleanCode.Helpers
     public class FilesCheckingProgressBar
     {
         private static readonly Regex ExtractCsFile = new Regex("(?<=)(\\w*\\.cs)$", RegexOptions.Compiled);
-        private readonly HashSet<string> uncheckedFiles;
         private readonly int totalFiles;
+        private readonly HashSet<string> uncheckedFiles;
 
         public FilesCheckingProgressBar(IEnumerable<FileInfo> validatedFiles)
         {

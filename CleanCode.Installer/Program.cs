@@ -6,11 +6,11 @@ using CleanCode.Results;
 
 namespace CleanCode.Installer
 {
-    class Program
+    internal class Program
     {
         private static readonly IDirectory CliDirectory = new CleanCodeDirectory();
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var versionProvider = new CleanCodeToolVersionProvider();
 
