@@ -16,7 +16,7 @@ namespace CleanCode.Cli.Commands.Cleanup
             if (files.Length > 1)
                 return "Found more then one .DotSettings file in sln directory";
 
-            return Result.Ok(new CleanCodeDirectory().WithSubDirectory("Utils\\Default.DotSettings"));
+            return Result.Ok(new CleanCodeDirectory().WithSubDirectory("Tool\\Default.DotSettings"));
         }
     }
 }
