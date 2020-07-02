@@ -28,11 +28,11 @@ namespace CleanCode.Cli.Commands.CodeInspections
         [Usage(ApplicationAlias = "clean-code")]
         public static IEnumerable<Example> Examples => new List<Example>
         {
-            new Example("Start code-inspection in current directory", new CodeInspectionsCommandOptions()),
+            new Example("Start code-inspection in current directory", new CodeInspectionsCommand()),
             new Example("Start code-inspection in given directory",
-                new CodeInspectionsCommandOptions {PathToSlnFolder = "<path to .sln file>"}),
+                new CodeInspectionsCommand {PathToSlnFolder = "<path to .sln file>"}),
             new Example("Start code-inspection with custom output file name",
-                new CodeInspectionsCommandOptions {OutFileName = "out.html"})
+                new CodeInspectionsCommand {OutFileName = "out.html"})
         };
     }
 }

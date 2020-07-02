@@ -53,7 +53,6 @@ namespace CleanCode.Cli
                         MaximumDisplayWidth = 100,
                         AutoVersion = false
                     }
-                    .AddPreOptionsLine("Info:")
                     .AddPostOptionsLine($"{CopyrightInfo.Default} v{CurrentVersion}"),
                 e => e,
                 true);

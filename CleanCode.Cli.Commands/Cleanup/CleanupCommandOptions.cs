@@ -25,8 +25,8 @@ namespace CleanCode.Cli.Commands.Cleanup
         {
             new Example("Start cleanup in current directory", new CleanupCommand()),
             new Example("Start cleanup in given directory",
-                new CleanupCommandOptions {PathToSlnFolder = "<path to .sln file>"}),
-            new Example("Start cleanup without cache", new CleanupCommandOptions {Force = true})
+                new CleanupCommand {PathToSlnFolder = "<path to .sln file>"}),
+            new Example("Start cleanup without cache", new CleanupCommand {Force = true})
         };
 
         #endregion

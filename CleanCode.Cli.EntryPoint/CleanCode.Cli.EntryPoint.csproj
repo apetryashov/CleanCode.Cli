@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <Company>@apetryashov</Company>
-        <Version>1.2</Version>
+        <Version>1.2.1</Version>
         <AssemblyTitle>clean-code</AssemblyTitle>
     </PropertyGroup>
 
@@ -34,6 +34,7 @@
         </None>
         <None Update="Default.DotSettings">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
     </ItemGroup>
 
